@@ -607,6 +607,7 @@ int AcceptanceEfficiency(int PhotSystIdx = 0, const char* fileInMC = "/eos/cms/s
 			continue;
 		}
 
+
 		double eta1 = gen_muon_eta->at(0);
 		double pt1 = gen_muon_pt->at(0);
 		double eta2 = gen_muon_eta->at(1);
@@ -623,9 +624,7 @@ int AcceptanceEfficiency(int PhotSystIdx = 0, const char* fileInMC = "/eos/cms/s
 		int matchJpsiPos = DimuonMCMatched(0); //includes those that don't pass the cuts, but reco exists
 		int matchPositionConv = PhotMCMatched(0);
 		int chicPos = ChiPassAllCutsMC(0);
-
 		TLorentzVector* LVmuon1 = (TLorentzVector*)gen_muon_p4->At(0);
-
 		///////////////////////////////////////
 		// total correction for chic/Jpsi ratio
 		///////////////////////////////////////
@@ -638,8 +637,6 @@ int AcceptanceEfficiency(int PhotSystIdx = 0, const char* fileInMC = "/eos/cms/s
 			double nTrack_inPV = pvtx_nTracks->at(dimuon_pvtx_indexFromOniaMuMu->at(JpsiPos));
 
 			double MCweight = h_weightPVtrk->GetBinContent(h_weightPVtrk->FindBin(nTrack_inPV));
-                        // add polarization reweighting to MC weight
-                        MCweight *= polarizedWeight;
 
 			if (ispPb == true) { //direction dependent stuff
 				MCweight = 1.28*MCweight*WeightForMC_pTpart(pt_JpsiReco)*WeightPhotonAcceptanceSystematic(pt_phot, PhotSystIdx);
@@ -764,8 +761,6 @@ int AcceptanceEfficiency(int PhotSystIdx = 0, const char* fileInMC = "/eos/cms/s
 				double nTrack_inPV = pvtx_nTracks->at(dimuon_pvtx_indexFromOniaMuMu->at(JpsiPos));
 
 				double MCweight = h_weightPVtrk->GetBinContent(h_weightPVtrk->FindBin(nTrack_inPV));
-                                // add polarization reweighting to MC weight
-                                MCweight *= polarizedWeight;
 
 				if (ispPb == true) { //direction dependent stuff
 					MCweight = 1.28*MCweight*WeightForMC_pTpart(pt_JpsiReco)*WeightPhotonAcceptanceSystematic(pt_phot, PhotSystIdx);
@@ -851,8 +846,6 @@ int AcceptanceEfficiency(int PhotSystIdx = 0, const char* fileInMC = "/eos/cms/s
 
 			double nTrack_inPV = ntracks_inEvent; //here use total ntrack, since unless there is reconstructed J/psi, we don't know what vertex to chose (total is the greatest PV)
 			double MCweight = h_weightPVtrk->GetBinContent(h_weightPVtrk->FindBin(nTrack_inPV));
-                        // add polarization reweighting to MC weight
-                        MCweight *= polarizedWeight;
 			double rap_Jpsi_corrections = rap_Jpsi; // rap_Jpsi not flipped, corrections yes
 			if (ispPb == true) { //direction dependent stuff
 				MCweight = 1.28*MCweight*WeightPhotonAcceptanceSystematic(pt_phot, PhotSystIdx); //pt weighted below
@@ -1173,12 +1166,11 @@ int AcceptanceEfficiency(int PhotSystIdx = 0, const char* fileInMC = "/eos/cms/s
 
 
 
-        std::string slambda1 = std::to_string(lambdaTheta1).substr(0,4);
-        if(lambdaTheta1<0) {slambda1 = std::to_string(lambdaTheta1).substr(0,5);}
-        std::string slambda2 = std::to_string(lambdaTheta2).substr(0,4);
-        if(lambdaTheta2<0) {slambda2 = std::to_string(lambdaTheta2).substr(0,5);}
 
-	TFile* fout = new TFile(TString(fileOut)+"_lambdaTheta1_"+TString(slambda1)+"_lambdaTheta2_"+TString(slambda2)+".root", "RECREATE");
+
+
+	TFile* fout = new TFile(fileOut, "RECREATE");
+
 	
 
 	h_chiTotalCorrection1D_pT_all_den->Write();
