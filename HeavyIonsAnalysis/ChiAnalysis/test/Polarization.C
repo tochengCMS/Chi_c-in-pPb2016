@@ -67,8 +67,7 @@ double binsWeightChi_nTrk[] = { 0, 50, 100, 150, 250, 400 };
 int  nbinsWeightChi_nTrk = sizeof(binsWeightChi_nTrk) / sizeof(double) - 1;
 
 
-//int AcceptanceEfficiency(int PhotSystIdx = 0, const char* fileInMC = "/eos/cms/store/group/phys_heavyions/okukral/Chi_c/Chi_c_pPb8TeV_MC-Official_v3-bothDir.root", const char* fileOut = "Chi_c_WeightsMC_Official_vDissertation-bothDir.root", const char* fileMCWeight = "MCWeight_v2.root")
-int AcceptanceEfficiency(int PhotSystIdx = 0, const char* fileInMC = "/eos/cms/store/group/phys_heavyions/okukral/Chi_c/Chi_c_pPb8TeV_MC-Official_v3-bothDir.root", const char* fileOut = "Chi_c_WeightsMC_Official_vTest-bothDir.root", const char* fileMCWeight = "MCWeight_v2.root")
+int AcceptanceEfficiency(int PhotSystIdx = 0, const char* fileInMC = "Chi_c_pPb8TeV_MC_noFilter.root", const char* fileOut = "Chi_c_WeightsMC_Official_vDissertation-bothDir", const char* fileMCWeight = "MCWeight_v2.root", double lambdaTheta1 = 1.0, double lambdaTheta2 = -0.60)
 {
 	//int PhotSystIdx = 0;
 	
@@ -476,100 +475,7 @@ int AcceptanceEfficiency(int PhotSystIdx = 0, const char* fileInMC = "/eos/cms/s
 	h_chiTotalCorrection1D_pT_bkwCMS_num->Sumw2();
 
 
-	///////////////////////////////////////////////
-//  TOTAL CORRECTION RATIO (CHIC1/CHIC2) //////
-//////////////////////////////////////////////
 
-/////////////////HISTOGRAM OF CHIC1////////////////////////
-
-	TH1D* h_chiTotCorrChic1_1D_pT_all_den = new TH1D("h_chiTotCorrChic1_1D_pT_all_den", "h_chiTotCorrChic1_1D_pT_all_den; p_{T}", nbins_pT, bins_pT);
-	TH1D* h_chiTotCorrChic1_1D_pT_all_num = new TH1D("h_chiTotCorrChic1_1D_pT_all_num", "h_chiTotCorrChic1_1D_pT_all_num; p_{T}", nbins_pT, bins_pT);
-	TH1D* h_chiTotCorrChic1_1D_pT_all_rat = new TH1D("h_chiTotCorrChic1_1D_pT_all_rat", "h_chiTotCorrChic1_1D_pT_all_rat; p_{T}", nbins_pT, bins_pT);
-
-	TH1D* h_chiTotCorrChic1_1D_y_den = new TH1D("h_chiTotCorrChic1_1D_y_den", "h_chiTotCorrChic1_1D_y_den; y", nbins_y, bins_y);
-	TH1D* h_chiTotCorrChic1_1D_y_num = new TH1D("h_chiTotCorrChic1_1D_y_num", "h_chiTotCorrChic1_1D_y_num; y", nbins_y, bins_y);
-	TH1D* h_chiTotCorrChic1_1D_y_rat = new TH1D("h_chiTotCorrChic1_1D_y_rat", "h_chiTotCorrChic1_1D_y_rat; y", nbins_y, bins_y);
-
-	TH1D* h_chiTotCorrChic1_1D_nTrk_all_den = new TH1D("h_chiTotCorrChic1_1D_nTrk_all_den", "h_chiTotCorrChic1_1D_nTrk_all_den; nTrk", nbins_nTrk, bins_nTrk);
-	TH1D* h_chiTotCorrChic1_1D_nTrk_all_num = new TH1D("h_chiTotCorrChic1_1D_nTrk_all_num", "h_chiTotCorrChic1_1D_nTrk_all_num; nTrk", nbins_nTrk, bins_nTrk);
-	TH1D* h_chiTotCorrChic1_1D_nTrk_all_rat = new TH1D("h_chiTotCorrChic1_1D_nTrk_all_rat", "h_chiTotCorrChic1_1D_nTrk_all_rat; nTrk", nbins_nTrk, bins_nTrk);
-
-	TH1D* h_chiTotCorrChic1_1D_pT_midCMS_den = new TH1D("h_chiTotCorrChic1_1D_pT_midCMS_den", "h_chiTotCorrChic1_1D_pT_midCMS_den; p_{T}", nbins_pT, bins_pT);
-	TH1D* h_chiTotCorrChic1_1D_pT_midCMS_num = new TH1D("h_chiTotCorrChic1_1D_pT_midCMS_num", "h_chiTotCorrChic1_1D_pT_midCMS_num; p_{T}", nbins_pT, bins_pT);
-	TH1D* h_chiTotCorrChic1_1D_pT_midCMS_rat = new TH1D("h_chiTotCorrChic1_1D_pT_midCMS_rat", "h_chiTotCorrChic1_1D_pT_midCMS_rat; p_{T}", nbins_pT, bins_pT);
-
-	TH1D* h_chiTotCorrChic1_1D_pT_fwdCMS_den = new TH1D("h_chiTotCorrChic1_1D_pT_fwdCMS_den", "h_chiTotCorrChic1_1D_pT_fwdCMS_den; p_{T}", nbins_pT, bins_pT);
-	TH1D* h_chiTotCorrChic1_1D_pT_fwdCMS_num = new TH1D("h_chiTotCorrChic1_1D_pT_fwdCMS_num", "h_chiTotCorrChic1_1D_pT_fwdCMS_num; p_{T}", nbins_pT, bins_pT);
-	TH1D* h_chiTotCorrChic1_1D_pT_fwdCMS_rat = new TH1D("h_chiTotCorrChic1_1D_pT_fwdCMS_rat", "h_chiTotCorrChic1_1D_pT_fwdCMS_rat; p_{T}", nbins_pT, bins_pT);
-
-	TH1D* h_chiTotCorrChic1_1D_pT_bkwCMS_den = new TH1D("h_chiTotCorrChic1_1D_pT_bkwCMS_den", "h_chiTotCorrChic1_1D_pT_bkwCMS_den; p_{T}", nbins_pT, bins_pT);
-	TH1D* h_chiTotCorrChic1_1D_pT_bkwCMS_num = new TH1D("h_chiTotCorrChic1_1D_pT_bkwCMS_num", "h_chiTotCorrChic1_1D_pT_bkwCMS_num; p_{T}", nbins_pT, bins_pT);
-	TH1D* h_chiTotCorrChic1_1D_pT_bkwCMS_rat = new TH1D("h_chiTotCorrChic1_1D_pT_bkwCMS_rat", "h_chiTotCorrChic1_1D_pT_bkwCMS_rat; p_{T}", nbins_pT, bins_pT);
-
-	h_chiTotCorrChic1_1D_pT_all_den->Sumw2();
-	h_chiTotCorrChic1_1D_y_den->Sumw2();
-	h_chiTotCorrChic1_1D_nTrk_all_den->Sumw2();
-	h_chiTotCorrChic1_1D_pT_midCMS_den->Sumw2();
-	h_chiTotCorrChic1_1D_pT_fwdCMS_den->Sumw2();
-	h_chiTotCorrChic1_1D_pT_bkwCMS_den->Sumw2();
-
-	h_chiTotCorrChic1_1D_pT_all_num->Sumw2();
-	h_chiTotCorrChic1_1D_y_num->Sumw2();
-	h_chiTotCorrChic1_1D_nTrk_all_num->Sumw2();
-	h_chiTotCorrChic1_1D_pT_midCMS_num->Sumw2();
-	h_chiTotCorrChic1_1D_pT_fwdCMS_num->Sumw2();
-	h_chiTotCorrChic1_1D_pT_bkwCMS_num->Sumw2();
-
-
-	/////////////////HISTOGRAM OF CHIC2//////////////////////// 
-
-	TH1D* h_chiTotCorrChic2_1D_pT_all_den = new TH1D("h_chiTotCorrChic2_1D_pT_all_den", "h_chiTotCorrChic2_1D_pT_all_den; p_{T}", nbins_pT, bins_pT);
-	TH1D* h_chiTotCorrChic2_1D_pT_all_num = new TH1D("h_chiTotCorrChic2_1D_pT_all_num", "h_chiTotCorrChic2_1D_pT_all_num; p_{T}", nbins_pT, bins_pT);
-	TH1D* h_chiTotCorrChic2_1D_pT_all_rat = new TH1D("h_chiTotCorrChic2_1D_pT_all_rat", "h_chiTotCorrChic2_1D_pT_all_rat; p_{T}", nbins_pT, bins_pT);
-
-	TH1D* h_chiTotCorrChic2_1D_y_den = new TH1D("h_chiTotCorrChic2_1D_y_den", "h_chiTotCorrChic2_1D_y_den; y", nbins_y, bins_y);
-	TH1D* h_chiTotCorrChic2_1D_y_num = new TH1D("h_chiTotCorrChic2_1D_y_num", "h_chiTotCorrChic2_1D_y_num; y", nbins_y, bins_y);
-	TH1D* h_chiTotCorrChic2_1D_y_rat = new TH1D("h_chiTotCorrChic2_1D_y_rat", "h_chiTotCorrChic2_1D_y_rat; y", nbins_y, bins_y);
-
-	TH1D* h_chiTotCorrChic2_1D_nTrk_all_den = new TH1D("h_chiTotCorrChic2_1D_nTrk_all_den", "h_chiTotCorrChic2_1D_nTrk_all_den; nTrk", nbins_nTrk, bins_nTrk);
-	TH1D* h_chiTotCorrChic2_1D_nTrk_all_num = new TH1D("h_chiTotCorrChic2_1D_nTrk_all_num", "h_chiTotCorrChic2_1D_nTrk_all_num; nTrk", nbins_nTrk, bins_nTrk);
-	TH1D* h_chiTotCorrChic2_1D_nTrk_all_rat = new TH1D("h_chiTotCorrChic2_1D_nTrk_all_rat", "h_chiTotCorrChic2_1D_nTrk_all_rat; nTrk", nbins_nTrk, bins_nTrk);
-
-	TH1D* h_chiTotCorrChic2_1D_pT_midCMS_den = new TH1D("h_chiTotCorrChic2_1D_pT_midCMS_den", "h_chiTotCorrChic2_1D_pT_midCMS_den; p_{T}", nbins_pT, bins_pT);
-	TH1D* h_chiTotCorrChic2_1D_pT_midCMS_num = new TH1D("h_chiTotCorrChic2_1D_pT_midCMS_num", "h_chiTotCorrChic2_1D_pT_midCMS_num; p_{T}", nbins_pT, bins_pT);
-	TH1D* h_chiTotCorrChic2_1D_pT_midCMS_rat = new TH1D("h_chiTotCorrChic2_1D_pT_midCMS_rat", "h_chiTotCorrChic2_1D_pT_midCMS_rat; p_{T}", nbins_pT, bins_pT);
-
-	TH1D* h_chiTotCorrChic2_1D_pT_fwdCMS_den = new TH1D("h_chiTotCorrChic2_1D_pT_fwdCMS_den", "h_chiTotCorrChic2_1D_pT_fwdCMS_den; p_{T}", nbins_pT, bins_pT);
-	TH1D* h_chiTotCorrChic2_1D_pT_fwdCMS_num = new TH1D("h_chiTotCorrChic2_1D_pT_fwdCMS_num", "h_chiTotCorrChic2_1D_pT_fwdCMS_num; p_{T}", nbins_pT, bins_pT);
-	TH1D* h_chiTotCorrChic2_1D_pT_fwdCMS_rat = new TH1D("h_chiTotCorrChic2_1D_pT_fwdCMS_rat", "h_chiTotCorrChic2_1D_pT_fwdCMS_rat; p_{T}", nbins_pT, bins_pT);
-
-	TH1D* h_chiTotCorrChic2_1D_pT_bkwCMS_den = new TH1D("h_chiTotCorrChic2_1D_pT_bkwCMS_den", "h_chiTotCorrChic2_1D_pT_bkwCMS_den; p_{T}", nbins_pT, bins_pT);
-	TH1D* h_chiTotCorrChic2_1D_pT_bkwCMS_num = new TH1D("h_chiTotCorrChic2_1D_pT_bkwCMS_num", "h_chiTotCorrChic2_1D_pT_bkwCMS_num; p_{T}", nbins_pT, bins_pT);
-	TH1D* h_chiTotCorrChic2_1D_pT_bkwCMS_rat = new TH1D("h_chiTotCorrChic2_1D_pT_bkwCMS_rat", "h_chiTotCorrChic2_1D_pT_bkwCMS_rat; p_{T}", nbins_pT, bins_pT);
-
-	h_chiTotCorrChic2_1D_pT_all_den->Sumw2();
-	h_chiTotCorrChic2_1D_y_den->Sumw2();
-	h_chiTotCorrChic2_1D_nTrk_all_den->Sumw2();
-	h_chiTotCorrChic2_1D_pT_midCMS_den->Sumw2();
-	h_chiTotCorrChic2_1D_pT_fwdCMS_den->Sumw2();
-	h_chiTotCorrChic2_1D_pT_bkwCMS_den->Sumw2();
-
-	h_chiTotCorrChic2_1D_pT_all_num->Sumw2();
-	h_chiTotCorrChic2_1D_y_num->Sumw2();
-	h_chiTotCorrChic2_1D_nTrk_all_num->Sumw2();
-	h_chiTotCorrChic2_1D_pT_midCMS_num->Sumw2();
-	h_chiTotCorrChic2_1D_pT_fwdCMS_num->Sumw2();
-	h_chiTotCorrChic2_1D_pT_bkwCMS_num->Sumw2();
-
-
-	/////////////////HISTOGRAM OF CHIC1/CHIC2//////////////////////// 
-
-	TH1D* h_chiTotCorrChic1toChic2_1D_pT_all_rat = new TH1D("h_chiTotCorrChic1toChic2_1D_pT_all_rat", "h_chiTotCorrChic1toChic2_1D_pT_all_rat; p_{T}", nbins_pT, bins_pT);
-	TH1D* h_chiTotCorrChic1toChic2_1D_y_rat = new TH1D("h_chiTotCorrChic1toChic2_1D_y_rat", "h_chiTotCorrChic1toChic2_1D_y_rat; y", nbins_y, bins_y);
-	TH1D* h_chiTotCorrChic1toChic2_1D_nTrk_all_rat = new TH1D("h_chiTotCorrChic1toChic2_1D_nTrk_all_rat", "h_chiTotCorrChic1toChic2_1D_nTrk_all_rat; nTrk", nbins_nTrk, bins_nTrk);
-	TH1D* h_chiTotCorrChic1toChic2_1D_pT_midCMS_rat = new TH1D("h_chiTotCorrChic1toChic2_1D_pT_midCMS_rat", "h_chiTotCorrChic1toChic2_1D_pT_midCMS_rat; p_{T}", nbins_pT, bins_pT);
-	TH1D* h_chiTotCorrChic1toChic2_1D_pT_fwdCMS_rat = new TH1D("h_chiTotCorrChic1toChic2_1D_pT_fwdCMS_rat", "h_chiTotCorrChic1toChic2_1D_pT_fwdCMS_rat; p_{T}", nbins_pT, bins_pT);
-	TH1D* h_chiTotCorrChic1toChic2_1D_pT_bkwCMS_rat = new TH1D("h_chiTotCorrChic1toChic2_1D_pT_bkwCMS_rat", "h_chiTotCorrChic1toChic2_1D_pT_bkwCMS_rat; p_{T}", nbins_pT, bins_pT);
 
 
 
@@ -591,7 +497,7 @@ int AcceptanceEfficiency(int PhotSystIdx = 0, const char* fileInMC = "/eos/cms/s
 	
 	Long64_t nentries = event_tree->GetEntries();
 	cout << "n entries: "<<nentries << endl;
-	//if (nentries > 500000) { nentries = 1000; }
+	//if (nentries > 500000) { nentries = 100000; }
 
 
 	for (Long64_t i = 0; i < nentries; i++) {
@@ -624,7 +530,30 @@ int AcceptanceEfficiency(int PhotSystIdx = 0, const char* fileInMC = "/eos/cms/s
 		int matchPositionConv = PhotMCMatched(0);
 		int chicPos = ChiPassAllCutsMC(0);
 
-		TLorentzVector* LVmuon1 = (TLorentzVector*)gen_muon_p4->At(0);
+                ///////////////////////////////////////
+                // polarization reweighting based on MC
+                ///////////////////////////////////////
+                double polarizedWeight = 1.0;
+
+                // check pdgId : whether chic_1 or chic_2
+                int pdgId = gen_pdgId->at(0);
+                // get LorentzVector of positive charged muon from J/Psi decays
+                TLorentzVector* LVmuonPositive = new TLorentzVector();
+                double charge1 = gen_muon_charge->at(0);
+                double charge2 = gen_muon_charge->at(1);
+                if ( charge1 > 0 ) {
+                             LVmuonPositive = (TLorentzVector*)gen_muon_p4->At(0);
+                }
+                else {
+                             LVmuonPositive = (TLorentzVector*)gen_muon_p4->At(1);
+                }
+                // get the polarization reweighting based on lambdaTheta for chic_1 or chic_2
+                if (pdgId == PythCode_chic1) {
+                          polarizedWeight = PolarizationWeight(LVJpsi, LVmuonPositive, lambdaTheta1);
+                }
+                if (pdgId == PythCode_chic2) {
+                          polarizedWeight = PolarizationWeight(LVJpsi, LVmuonPositive, lambdaTheta2);
+                }
 
 		///////////////////////////////////////
 		// total correction for chic/Jpsi ratio
@@ -649,7 +578,8 @@ int AcceptanceEfficiency(int PhotSystIdx = 0, const char* fileInMC = "/eos/cms/s
 				MCweight = 0.72*MCweight*WeightForMC_pTpart(pt_JpsiReco)*WeightPhotonAcceptanceSystematic(pt_phot, PhotSystIdx);
 				rap_JpsiReco = -rap_JpsiReco;
 			}
-			//cout << "CosTheta is " << PolarizationCosTheta(LVJpsiReco, LVmuon1) << "	And weight " << PolarizationWeight(LVJpsiReco, LVmuon1, 0.5) << endl;
+
+
 			h_chiTotalCorrection1D_pT_all_den->Fill(pt_JpsiReco, MCweight);
 			h_chiTotalCorrection1D_y_den->Fill(rap_JpsiReco, MCweight);
 			if (fabs(rap_JpsiReco) < 1.0) { h_chiTotalCorrection1D_nTrk_den->Fill(nTrack_inPV, MCweight); }
@@ -684,58 +614,6 @@ int AcceptanceEfficiency(int PhotSystIdx = 0, const char* fileInMC = "/eos/cms/s
 				if (rap_JpsiReco > rapCM_Edge3 && rap_JpsiReco < rapCM_Edge4) { h_chiTotalCorrection1D_pT_fwdCMS_num->Fill(pt_JpsiReco, MCweight); }
 				if (rap_JpsiReco > rapCM_Edge1 && rap_JpsiReco < rapCM_Edge2) { h_chiTotalCorrection1D_pT_bkwCMS_num->Fill(pt_JpsiReco, MCweight); }
 			}
-
-
-
-			// Chic1 to Chic2 ratio 
-			//
-			// Chic1 
-			if (gen_pdgId->at(0) == PythCode_chic1) {
-
-				h_chiTotCorrChic1_1D_pT_all_den->Fill(pt_JpsiReco, MCweight);
-				h_chiTotCorrChic1_1D_y_den->Fill(rap_JpsiReco, MCweight);
-				h_chiTotCorrChic1_1D_nTrk_all_den->Fill(nTrack_inPV, MCweight);
-				if (rap_JpsiReco > rapCM_Edge2 && rap_JpsiReco < rapCM_Edge3) { h_chiTotCorrChic1_1D_pT_midCMS_den->Fill(pt_JpsiReco, MCweight); }
-				if (rap_JpsiReco > rapCM_Edge3 && rap_JpsiReco < rapCM_Edge4) { h_chiTotCorrChic1_1D_pT_fwdCMS_den->Fill(pt_JpsiReco, MCweight); }
-				if (rap_JpsiReco > rapCM_Edge1 && rap_JpsiReco < rapCM_Edge2) { h_chiTotCorrChic1_1D_pT_bkwCMS_den->Fill(pt_JpsiReco, MCweight); }
-
-				if (chicPos > -1) {
-
-					h_chiTotCorrChic1_1D_pT_all_num->Fill(pt_JpsiReco, MCweight);
-					h_chiTotCorrChic1_1D_y_num->Fill(rap_JpsiReco, MCweight);
-					h_chiTotCorrChic1_1D_nTrk_all_num->Fill(nTrack_inPV, MCweight);
-					if (rap_JpsiReco > rapCM_Edge2 && rap_JpsiReco < rapCM_Edge3) { h_chiTotCorrChic1_1D_pT_midCMS_num->Fill(pt_JpsiReco, MCweight); }
-					if (rap_JpsiReco > rapCM_Edge3 && rap_JpsiReco < rapCM_Edge4) { h_chiTotCorrChic1_1D_pT_fwdCMS_num->Fill(pt_JpsiReco, MCweight); }
-					if (rap_JpsiReco > rapCM_Edge1 && rap_JpsiReco < rapCM_Edge2) { h_chiTotCorrChic1_1D_pT_bkwCMS_num->Fill(pt_JpsiReco, MCweight); }
-
-				}
-
-			}
-			//
-			// Chic2
-			if (gen_pdgId->at(0) == PythCode_chic2) {
-
-				h_chiTotCorrChic2_1D_pT_all_den->Fill(pt_JpsiReco, MCweight);
-				h_chiTotCorrChic2_1D_y_den->Fill(rap_JpsiReco, MCweight);
-				h_chiTotCorrChic2_1D_nTrk_all_den->Fill(nTrack_inPV, MCweight);
-				if (rap_JpsiReco > rapCM_Edge2 && rap_JpsiReco < rapCM_Edge3) { h_chiTotCorrChic2_1D_pT_midCMS_den->Fill(pt_JpsiReco, MCweight); }
-				if (rap_JpsiReco > rapCM_Edge3 && rap_JpsiReco < rapCM_Edge4) { h_chiTotCorrChic2_1D_pT_fwdCMS_den->Fill(pt_JpsiReco, MCweight); }
-				if (rap_JpsiReco > rapCM_Edge1 && rap_JpsiReco < rapCM_Edge2) { h_chiTotCorrChic2_1D_pT_bkwCMS_den->Fill(pt_JpsiReco, MCweight); }
-
-				if (chicPos > -1) {
-
-					h_chiTotCorrChic2_1D_pT_all_num->Fill(pt_JpsiReco, MCweight);
-					h_chiTotCorrChic2_1D_y_num->Fill(rap_JpsiReco, MCweight);
-					h_chiTotCorrChic2_1D_nTrk_all_num->Fill(nTrack_inPV, MCweight);
-					if (rap_JpsiReco > rapCM_Edge2 && rap_JpsiReco < rapCM_Edge3) { h_chiTotCorrChic2_1D_pT_midCMS_num->Fill(pt_JpsiReco, MCweight); }
-					if (rap_JpsiReco > rapCM_Edge3 && rap_JpsiReco < rapCM_Edge4) { h_chiTotCorrChic2_1D_pT_fwdCMS_num->Fill(pt_JpsiReco, MCweight); }
-					if (rap_JpsiReco > rapCM_Edge1 && rap_JpsiReco < rapCM_Edge2) { h_chiTotCorrChic2_1D_pT_bkwCMS_num->Fill(pt_JpsiReco, MCweight); }
-
-				}
-
-
-			}
-		
 		}
 
 		
@@ -1037,30 +915,6 @@ int AcceptanceEfficiency(int PhotSystIdx = 0, const char* fileInMC = "/eos/cms/s
 	h_chiTotalCorrection1D_pT_midCMS_rat->Divide(h_chiTotalCorrection1D_pT_midCMS_num, h_chiTotalCorrection1D_pT_midCMS_den, 1, 1, "B");
 	h_chiTotalCorrection1D_pT_fwdCMS_rat->Divide(h_chiTotalCorrection1D_pT_fwdCMS_num, h_chiTotalCorrection1D_pT_fwdCMS_den, 1, 1, "B");
 	h_chiTotalCorrection1D_pT_bkwCMS_rat->Divide(h_chiTotalCorrection1D_pT_bkwCMS_num, h_chiTotalCorrection1D_pT_bkwCMS_den, 1, 1, "B");
-
-	/////////Efficiency of Chic1///////////////////
-	h_chiTotCorrChic1_1D_pT_all_rat->Divide(h_chiTotCorrChic1_1D_pT_all_num, h_chiTotCorrChic1_1D_pT_all_den, 1, 1, "B");
-	h_chiTotCorrChic1_1D_y_rat->Divide(h_chiTotCorrChic1_1D_y_num, h_chiTotCorrChic1_1D_y_den, 1, 1, "B");
-	h_chiTotCorrChic1_1D_nTrk_all_rat->Divide(h_chiTotCorrChic1_1D_nTrk_all_num, h_chiTotCorrChic1_1D_nTrk_all_den, 1, 1, "B");
-	h_chiTotCorrChic1_1D_pT_midCMS_rat->Divide(h_chiTotCorrChic1_1D_pT_midCMS_num, h_chiTotCorrChic1_1D_pT_midCMS_den, 1, 1, "B");
-	h_chiTotCorrChic1_1D_pT_fwdCMS_rat->Divide(h_chiTotCorrChic1_1D_pT_fwdCMS_num, h_chiTotCorrChic1_1D_pT_fwdCMS_den, 1, 1, "B");
-	h_chiTotCorrChic1_1D_pT_bkwCMS_rat->Divide(h_chiTotCorrChic1_1D_pT_bkwCMS_num, h_chiTotCorrChic1_1D_pT_bkwCMS_den, 1, 1, "B");
-
-	/////////Efficiency of Chic2/////////////////// 
-	h_chiTotCorrChic2_1D_pT_all_rat->Divide(h_chiTotCorrChic2_1D_pT_all_num, h_chiTotCorrChic2_1D_pT_all_den, 1, 1, "B");
-	h_chiTotCorrChic2_1D_y_rat->Divide(h_chiTotCorrChic2_1D_y_num, h_chiTotCorrChic2_1D_y_den, 1, 1, "B");
-	h_chiTotCorrChic2_1D_nTrk_all_rat->Divide(h_chiTotCorrChic2_1D_nTrk_all_num, h_chiTotCorrChic2_1D_nTrk_all_den, 1, 1, "B");
-	h_chiTotCorrChic2_1D_pT_midCMS_rat->Divide(h_chiTotCorrChic2_1D_pT_midCMS_num, h_chiTotCorrChic2_1D_pT_midCMS_den, 1, 1, "B");
-	h_chiTotCorrChic2_1D_pT_fwdCMS_rat->Divide(h_chiTotCorrChic2_1D_pT_fwdCMS_num, h_chiTotCorrChic2_1D_pT_fwdCMS_den, 1, 1, "B");
-	h_chiTotCorrChic2_1D_pT_bkwCMS_rat->Divide(h_chiTotCorrChic2_1D_pT_bkwCMS_num, h_chiTotCorrChic2_1D_pT_bkwCMS_den, 1, 1, "B");
-
-	/////////Efficiency of Chic1/Chic2/////////////////// 
-	h_chiTotCorrChic1toChic2_1D_pT_all_rat->Divide(h_chiTotCorrChic1_1D_pT_all_rat, h_chiTotCorrChic2_1D_pT_all_rat, 1, 1);
-	h_chiTotCorrChic1toChic2_1D_y_rat->Divide(h_chiTotCorrChic1_1D_y_rat, h_chiTotCorrChic2_1D_y_rat, 1, 1);
-	h_chiTotCorrChic1toChic2_1D_nTrk_all_rat->Divide(h_chiTotCorrChic1_1D_nTrk_all_rat, h_chiTotCorrChic2_1D_nTrk_all_rat, 1, 1);
-	h_chiTotCorrChic1toChic2_1D_pT_midCMS_rat->Divide(h_chiTotCorrChic1_1D_pT_midCMS_rat, h_chiTotCorrChic2_1D_pT_midCMS_rat, 1, 1);
-	h_chiTotCorrChic1toChic2_1D_pT_fwdCMS_rat->Divide(h_chiTotCorrChic1_1D_pT_fwdCMS_rat, h_chiTotCorrChic2_1D_pT_fwdCMS_rat, 1, 1);
-	h_chiTotCorrChic1toChic2_1D_pT_bkwCMS_rat->Divide(h_chiTotCorrChic1_1D_pT_bkwCMS_rat, h_chiTotCorrChic2_1D_pT_bkwCMS_rat, 1, 1);
 
 
 
@@ -1425,66 +1279,6 @@ int AcceptanceEfficiency(int PhotSystIdx = 0, const char* fileInMC = "/eos/cms/s
 	h_JpsiAccEff_rat_nTrk->Write();
 	h_chiAccEff_rat->Write();
 	h_chiAccEff_rat_nTrk->Write();
-
-	//write histograms for Chic1/Chic2 Efficiency
-
-	h_chiTotCorrChic1_1D_pT_all_den->Write();
-	h_chiTotCorrChic1_1D_y_den->Write();
-	h_chiTotCorrChic1_1D_nTrk_all_den->Write();
-	h_chiTotCorrChic1_1D_pT_midCMS_den->Write();
-	h_chiTotCorrChic1_1D_pT_fwdCMS_den->Write();
-	h_chiTotCorrChic1_1D_pT_bkwCMS_den->Write();
-
-	h_chiTotCorrChic1_1D_pT_all_num->Write();
-	h_chiTotCorrChic1_1D_y_num->Write();
-	h_chiTotCorrChic1_1D_nTrk_all_num->Write();
-	h_chiTotCorrChic1_1D_pT_midCMS_num->Write();
-	h_chiTotCorrChic1_1D_pT_fwdCMS_num->Write();
-	h_chiTotCorrChic1_1D_pT_bkwCMS_num->Write();
-
-
-	h_chiTotCorrChic2_1D_pT_all_den->Write();
-	h_chiTotCorrChic2_1D_y_den->Write();
-	h_chiTotCorrChic2_1D_nTrk_all_den->Write();
-	h_chiTotCorrChic2_1D_pT_midCMS_den->Write();
-	h_chiTotCorrChic2_1D_pT_fwdCMS_den->Write();
-	h_chiTotCorrChic2_1D_pT_bkwCMS_den->Write();
-
-	h_chiTotCorrChic2_1D_pT_all_num->Write();
-	h_chiTotCorrChic2_1D_y_num->Write();
-	h_chiTotCorrChic2_1D_nTrk_all_num->Write();
-	h_chiTotCorrChic2_1D_pT_midCMS_num->Write();
-	h_chiTotCorrChic2_1D_pT_fwdCMS_num->Write();
-	h_chiTotCorrChic2_1D_pT_bkwCMS_num->Write();
-
-	h_chiTotCorrChic1_1D_pT_all_rat->Write();
-	h_chiTotCorrChic1_1D_y_rat->Write();
-	h_chiTotCorrChic1_1D_nTrk_all_rat->Write();
-	h_chiTotCorrChic1_1D_pT_midCMS_rat->Write();
-	h_chiTotCorrChic1_1D_pT_fwdCMS_rat->Write();
-	h_chiTotCorrChic1_1D_pT_bkwCMS_rat->Write();
-
-	h_chiTotCorrChic2_1D_pT_all_rat->Write();
-	h_chiTotCorrChic2_1D_y_rat->Write();
-	h_chiTotCorrChic2_1D_nTrk_all_rat->Write();
-	h_chiTotCorrChic2_1D_pT_midCMS_rat->Write();
-	h_chiTotCorrChic2_1D_pT_fwdCMS_rat->Write();
-	h_chiTotCorrChic2_1D_pT_bkwCMS_rat->Write();
-
-	h_chiTotCorrChic1toChic2_1D_pT_all_rat->Write();
-	h_chiTotCorrChic1toChic2_1D_y_rat->Write();
-	h_chiTotCorrChic1toChic2_1D_nTrk_all_rat->Write();
-	h_chiTotCorrChic1toChic2_1D_pT_midCMS_rat->Write();
-	h_chiTotCorrChic1toChic2_1D_pT_fwdCMS_rat->Write();
-	h_chiTotCorrChic1toChic2_1D_pT_bkwCMS_rat->Write();
-
-
-
-
-
-
-
-
 
 
 	fout->Close();
