@@ -793,93 +793,94 @@ int PolarizationEffect(int PhotSystIdx = 0, const char* fileInMC = "/eos/cms/sto
 			if (MuonAcceptance(eta1, pt1) == true && MuonAcceptance(eta2, pt2) == true && DimuonAcceptance(rap_Jpsi, pt_Jpsi) == true)
 			{
 
-		       // Total correction for chic/Jpsi ratio
+               // Total correction for chic/Jpsi ratio
+			   if (MuonSelectionPassMC(0) == true && MuonSelectionPassMC(1) == true && DimuonSelectionPassMC(0) == true){
+			
+			       h_chiTotalCorrection1D_pT_all_den->Fill(pt_Jpsi, MCweight);
+			       h_chiTotalCorrection1D_y_den->Fill(rap_Jpsi, MCweight);
+			       if (fabs(rap_Jpsi) < 1.0) { h_chiTotalCorrection1D_nTrk_den->Fill(nTrack_inPV, MCweight); }
+			       h_chiTotalCorrection1D_nTrk_all_den->Fill(nTrack_inPV, MCweight);
+			       if (fabs(rap_Jpsi) < 1.0) { h_chiTotalCorrection1D_pT_mid_den->Fill(pt_Jpsi, MCweight); }
+			       else { h_chiTotalCorrection1D_pT_fwd_den->Fill(pt_Jpsi, MCweight); }
 
-			   // denominator : J/Psi in the gen level acceptance (fiducial volume)
-			   h_chiTotalCorrection1D_pT_all_den->Fill(pt_Jpsi, MCweight);
-			   h_chiTotalCorrection1D_y_den->Fill(rap_Jpsi, MCweight);
-			   if (fabs(rap_Jpsi) < 1.0) { h_chiTotalCorrection1D_nTrk_den->Fill(nTrack_inPV, MCweight); }
-			   h_chiTotalCorrection1D_nTrk_all_den->Fill(nTrack_inPV, MCweight);
-			   if (fabs(rap_Jpsi) < 1.0) { h_chiTotalCorrection1D_pT_mid_den->Fill(pt_Jpsi, MCweight); }
-			   else { h_chiTotalCorrection1D_pT_fwd_den->Fill(pt_Jpsi, MCweight); }
+			       if (rap_Jpsi > 1.6) { h_chiTotalCorrection1D_pT_fwdOnly_den->Fill(pt_Jpsi, MCweight); }
+			       if (rap_Jpsi > 1.0) { h_chiTotalCorrection1D_pT_fwdOnlyWide_den->Fill(pt_Jpsi, MCweight); }
+			       if (rap_Jpsi < -1.6) { h_chiTotalCorrection1D_pT_bkwOnly_den->Fill(pt_Jpsi, MCweight); }
+			       if (rap_Jpsi < -1.0) { h_chiTotalCorrection1D_pT_bkwOnlyWide_den->Fill(pt_Jpsi, MCweight); }
+			       if (rap_Jpsi > rapCM_Edge2 && rap_Jpsi < rapCM_Edge3) { h_chiTotalCorrection1D_pT_midCMS_den->Fill(pt_Jpsi, MCweight); }
+			       if (rap_Jpsi > rapCM_Edge3 && rap_Jpsi < rapCM_Edge4) { h_chiTotalCorrection1D_pT_fwdCMS_den->Fill(pt_Jpsi, MCweight); }
+			       if (rap_Jpsi > rapCM_Edge1 && rap_Jpsi < rapCM_Edge2) { h_chiTotalCorrection1D_pT_bkwCMS_den->Fill(pt_Jpsi, MCweight); }
 
-			   if (rap_Jpsi > 1.6) { h_chiTotalCorrection1D_pT_fwdOnly_den->Fill(pt_Jpsi, MCweight); }
-			   if (rap_Jpsi > 1.0) { h_chiTotalCorrection1D_pT_fwdOnlyWide_den->Fill(pt_Jpsi, MCweight); }
-			   if (rap_Jpsi < -1.6) { h_chiTotalCorrection1D_pT_bkwOnly_den->Fill(pt_Jpsi, MCweight); }
-			   if (rap_Jpsi < -1.0) { h_chiTotalCorrection1D_pT_bkwOnlyWide_den->Fill(pt_Jpsi, MCweight); }
-			   if (rap_Jpsi > rapCM_Edge2 && rap_Jpsi < rapCM_Edge3) { h_chiTotalCorrection1D_pT_midCMS_den->Fill(pt_Jpsi, MCweight); }
-			   if (rap_Jpsi > rapCM_Edge3 && rap_Jpsi < rapCM_Edge4) { h_chiTotalCorrection1D_pT_fwdCMS_den->Fill(pt_Jpsi, MCweight); }
-			   if (rap_Jpsi > rapCM_Edge1 && rap_Jpsi < rapCM_Edge2) { h_chiTotalCorrection1D_pT_bkwCMS_den->Fill(pt_Jpsi, MCweight); }
+			       // numerator : found chic_1 or chic_2 reconstructed
+			       if (chicPos > -1) 
+			       {
+				       h_chiTotalCorrection1D_pT_all_num->Fill(pt_Jpsi, MCweight);
+				       h_chiTotalCorrection1D_y_num->Fill(rap_Jpsi, MCweight);
+				       if (fabs(rap_Jpsi) < 1.0) { h_chiTotalCorrection1D_nTrk_num->Fill(nTrack_inPV, MCweight); }
+				       h_chiTotalCorrection1D_nTrk_all_num->Fill(nTrack_inPV, MCweight);
+				       if (fabs(rap_Jpsi) < 1.0) { h_chiTotalCorrection1D_pT_mid_num->Fill(pt_Jpsi, MCweight); }
+				       else { h_chiTotalCorrection1D_pT_fwd_num->Fill(pt_Jpsi, MCweight); }
 
-			   // numerator : found chic_1 or chic_2 reconstructed
-			   if (chicPos > -1) 
-			   {
-				   h_chiTotalCorrection1D_pT_all_num->Fill(pt_Jpsi, MCweight);
-				   h_chiTotalCorrection1D_y_num->Fill(rap_Jpsi, MCweight);
-				   if (fabs(rap_Jpsi) < 1.0) { h_chiTotalCorrection1D_nTrk_num->Fill(nTrack_inPV, MCweight); }
-				   h_chiTotalCorrection1D_nTrk_all_num->Fill(nTrack_inPV, MCweight);
-				   if (fabs(rap_Jpsi) < 1.0) { h_chiTotalCorrection1D_pT_mid_num->Fill(pt_Jpsi, MCweight); }
-				   else { h_chiTotalCorrection1D_pT_fwd_num->Fill(pt_Jpsi, MCweight); }
+				       if (rap_Jpsi > 1.6) { h_chiTotalCorrection1D_pT_fwdOnly_num->Fill(pt_Jpsi, MCweight); }
+				       if (rap_Jpsi < -1.6) { h_chiTotalCorrection1D_pT_bkwOnly_num->Fill(pt_Jpsi, MCweight); }
+				       if (rap_Jpsi > 1.0) { h_chiTotalCorrection1D_pT_fwdOnlyWide_num->Fill(pt_Jpsi, MCweight); }
+				       if (rap_Jpsi < -1.0) { h_chiTotalCorrection1D_pT_bkwOnlyWide_num->Fill(pt_Jpsi, MCweight); }
+				       if (rap_Jpsi > rapCM_Edge2 && rap_Jpsi < rapCM_Edge3) { h_chiTotalCorrection1D_pT_midCMS_num->Fill(pt_Jpsi, MCweight); }
+				       if (rap_Jpsi > rapCM_Edge3 && rap_Jpsi < rapCM_Edge4) { h_chiTotalCorrection1D_pT_fwdCMS_num->Fill(pt_Jpsi, MCweight); }
+				       if (rap_Jpsi > rapCM_Edge1 && rap_Jpsi < rapCM_Edge2) { h_chiTotalCorrection1D_pT_bkwCMS_num->Fill(pt_Jpsi, MCweight); }
+			       }
 
-				   if (rap_Jpsi > 1.6) { h_chiTotalCorrection1D_pT_fwdOnly_num->Fill(pt_Jpsi, MCweight); }
-				   if (rap_Jpsi < -1.6) { h_chiTotalCorrection1D_pT_bkwOnly_num->Fill(pt_Jpsi, MCweight); }
-				   if (rap_Jpsi > 1.0) { h_chiTotalCorrection1D_pT_fwdOnlyWide_num->Fill(pt_Jpsi, MCweight); }
-				   if (rap_Jpsi < -1.0) { h_chiTotalCorrection1D_pT_bkwOnlyWide_num->Fill(pt_Jpsi, MCweight); }
-				   if (rap_Jpsi > rapCM_Edge2 && rap_Jpsi < rapCM_Edge3) { h_chiTotalCorrection1D_pT_midCMS_num->Fill(pt_Jpsi, MCweight); }
-				   if (rap_Jpsi > rapCM_Edge3 && rap_Jpsi < rapCM_Edge4) { h_chiTotalCorrection1D_pT_fwdCMS_num->Fill(pt_Jpsi, MCweight); }
-				   if (rap_Jpsi > rapCM_Edge1 && rap_Jpsi < rapCM_Edge2) { h_chiTotalCorrection1D_pT_bkwCMS_num->Fill(pt_Jpsi, MCweight); }
+     		       // Chic1 to Chic2 ratio 
+
+			       // denominator : J/Psi in fiducial volume and gen-level particle is chic 1
+     		       if (gen_pdgId->at(0) == PythCode_chic1) {
+
+ 				       h_chiTotCorrChic1_1D_pT_all_den->Fill(pt_Jpsi, MCweight);
+				       h_chiTotCorrChic1_1D_y_den->Fill(rap_Jpsi, MCweight);
+				       h_chiTotCorrChic1_1D_nTrk_all_den->Fill(nTrack_inPV, MCweight);
+				       if (rap_Jpsi > rapCM_Edge2 && rap_Jpsi < rapCM_Edge3) { h_chiTotCorrChic1_1D_pT_midCMS_den->Fill(pt_Jpsi, MCweight); }
+				       if (rap_Jpsi > rapCM_Edge3 && rap_Jpsi < rapCM_Edge4) { h_chiTotCorrChic1_1D_pT_fwdCMS_den->Fill(pt_Jpsi, MCweight); }
+				       if (rap_Jpsi > rapCM_Edge1 && rap_Jpsi < rapCM_Edge2) { h_chiTotCorrChic1_1D_pT_bkwCMS_den->Fill(pt_Jpsi, MCweight); }
+
+                       // numerator : found chic reconstructed
+				       if (chicPos > -1) { 
+
+					       h_chiTotCorrChic1_1D_pT_all_num->Fill(pt_Jpsi, MCweight);
+					       h_chiTotCorrChic1_1D_y_num->Fill(rap_Jpsi, MCweight);
+					       h_chiTotCorrChic1_1D_nTrk_all_num->Fill(nTrack_inPV, MCweight);
+					       if (rap_Jpsi > rapCM_Edge2 && rap_Jpsi < rapCM_Edge3) { h_chiTotCorrChic1_1D_pT_midCMS_num->Fill(pt_Jpsi, MCweight); }
+					       if (rap_Jpsi > rapCM_Edge3 && rap_Jpsi < rapCM_Edge4) { h_chiTotCorrChic1_1D_pT_fwdCMS_num->Fill(pt_Jpsi, MCweight); }
+					       if (rap_Jpsi > rapCM_Edge1 && rap_Jpsi < rapCM_Edge2) { h_chiTotCorrChic1_1D_pT_bkwCMS_num->Fill(pt_Jpsi, MCweight); }
+
+				       }
+
+			       }
+
+			       // denominator : J/Psi in fiducial volume and gen-level particle is chic 2
+			       if (gen_pdgId->at(0) == PythCode_chic2) {
+
+				       h_chiTotCorrChic2_1D_pT_all_den->Fill(pt_Jpsi, MCweight);
+				       h_chiTotCorrChic2_1D_y_den->Fill(rap_Jpsi, MCweight);
+				       h_chiTotCorrChic2_1D_nTrk_all_den->Fill(nTrack_inPV, MCweight);
+				       if (rap_Jpsi > rapCM_Edge2 && rap_Jpsi < rapCM_Edge3) { h_chiTotCorrChic2_1D_pT_midCMS_den->Fill(pt_Jpsi, MCweight); }
+				       if (rap_Jpsi > rapCM_Edge3 && rap_Jpsi < rapCM_Edge4) { h_chiTotCorrChic2_1D_pT_fwdCMS_den->Fill(pt_Jpsi, MCweight); }
+				       if (rap_Jpsi > rapCM_Edge1 && rap_Jpsi < rapCM_Edge2) { h_chiTotCorrChic2_1D_pT_bkwCMS_den->Fill(pt_Jpsi, MCweight); }
+
+                       // numberator : found chic reconstructed
+				       if (chicPos > -1) { 
+
+					       h_chiTotCorrChic2_1D_pT_all_num->Fill(pt_Jpsi, MCweight);
+					       h_chiTotCorrChic2_1D_y_num->Fill(rap_Jpsi, MCweight);
+					       h_chiTotCorrChic2_1D_nTrk_all_num->Fill(nTrack_inPV, MCweight);
+					       if (rap_Jpsi > rapCM_Edge2 && rap_Jpsi < rapCM_Edge3) { h_chiTotCorrChic2_1D_pT_midCMS_num->Fill(pt_Jpsi, MCweight); }
+					       if (rap_Jpsi > rapCM_Edge3 && rap_Jpsi < rapCM_Edge4) { h_chiTotCorrChic2_1D_pT_fwdCMS_num->Fill(pt_Jpsi, MCweight); }
+					       if (rap_Jpsi > rapCM_Edge1 && rap_Jpsi < rapCM_Edge2) { h_chiTotCorrChic2_1D_pT_bkwCMS_num->Fill(pt_Jpsi, MCweight); }
+
+				       }
+
+				    }
+
 			   }
-
-     		   // Chic1 to Chic2 ratio 
-
-			   // denominator : J/Psi in fiducial volume and gen-level particle is chic 1
-     		   if (gen_pdgId->at(0) == PythCode_chic1) {
-
- 				   h_chiTotCorrChic1_1D_pT_all_den->Fill(pt_Jpsi, MCweight);
-				   h_chiTotCorrChic1_1D_y_den->Fill(rap_Jpsi, MCweight);
-				   h_chiTotCorrChic1_1D_nTrk_all_den->Fill(nTrack_inPV, MCweight);
-				   if (rap_Jpsi > rapCM_Edge2 && rap_Jpsi < rapCM_Edge3) { h_chiTotCorrChic1_1D_pT_midCMS_den->Fill(pt_Jpsi, MCweight); }
-				   if (rap_Jpsi > rapCM_Edge3 && rap_Jpsi < rapCM_Edge4) { h_chiTotCorrChic1_1D_pT_fwdCMS_den->Fill(pt_Jpsi, MCweight); }
-				   if (rap_Jpsi > rapCM_Edge1 && rap_Jpsi < rapCM_Edge2) { h_chiTotCorrChic1_1D_pT_bkwCMS_den->Fill(pt_Jpsi, MCweight); }
-
-                   // numerator : found chic reconstructed
-				   if (chicPos > -1) { 
-
-					   h_chiTotCorrChic1_1D_pT_all_num->Fill(pt_Jpsi, MCweight);
-					   h_chiTotCorrChic1_1D_y_num->Fill(rap_Jpsi, MCweight);
-					   h_chiTotCorrChic1_1D_nTrk_all_num->Fill(nTrack_inPV, MCweight);
-					   if (rap_Jpsi > rapCM_Edge2 && rap_Jpsi < rapCM_Edge3) { h_chiTotCorrChic1_1D_pT_midCMS_num->Fill(pt_Jpsi, MCweight); }
-					   if (rap_Jpsi > rapCM_Edge3 && rap_Jpsi < rapCM_Edge4) { h_chiTotCorrChic1_1D_pT_fwdCMS_num->Fill(pt_Jpsi, MCweight); }
-					   if (rap_Jpsi > rapCM_Edge1 && rap_Jpsi < rapCM_Edge2) { h_chiTotCorrChic1_1D_pT_bkwCMS_num->Fill(pt_Jpsi, MCweight); }
-
-				   }
-
-			   }
-
-			   // denominator : J/Psi in fiducial volume and gen-level particle is chic 2
-			   if (gen_pdgId->at(0) == PythCode_chic2) {
-
-				   h_chiTotCorrChic2_1D_pT_all_den->Fill(pt_Jpsi, MCweight);
-				   h_chiTotCorrChic2_1D_y_den->Fill(rap_Jpsi, MCweight);
-				   h_chiTotCorrChic2_1D_nTrk_all_den->Fill(nTrack_inPV, MCweight);
-				   if (rap_Jpsi > rapCM_Edge2 && rap_Jpsi < rapCM_Edge3) { h_chiTotCorrChic2_1D_pT_midCMS_den->Fill(pt_Jpsi, MCweight); }
-				   if (rap_Jpsi > rapCM_Edge3 && rap_Jpsi < rapCM_Edge4) { h_chiTotCorrChic2_1D_pT_fwdCMS_den->Fill(pt_Jpsi, MCweight); }
-				   if (rap_Jpsi > rapCM_Edge1 && rap_Jpsi < rapCM_Edge2) { h_chiTotCorrChic2_1D_pT_bkwCMS_den->Fill(pt_Jpsi, MCweight); }
-
-                   // numberator : found chic reconstructed
-				   if (chicPos > -1) { 
-
-					   h_chiTotCorrChic2_1D_pT_all_num->Fill(pt_Jpsi, MCweight);
-					   h_chiTotCorrChic2_1D_y_num->Fill(rap_Jpsi, MCweight);
-					   h_chiTotCorrChic2_1D_nTrk_all_num->Fill(nTrack_inPV, MCweight);
-					   if (rap_Jpsi > rapCM_Edge2 && rap_Jpsi < rapCM_Edge3) { h_chiTotCorrChic2_1D_pT_midCMS_num->Fill(pt_Jpsi, MCweight); }
-					   if (rap_Jpsi > rapCM_Edge3 && rap_Jpsi < rapCM_Edge4) { h_chiTotCorrChic2_1D_pT_fwdCMS_num->Fill(pt_Jpsi, MCweight); }
-					   if (rap_Jpsi > rapCM_Edge1 && rap_Jpsi < rapCM_Edge2) { h_chiTotCorrChic2_1D_pT_bkwCMS_num->Fill(pt_Jpsi, MCweight); }
-
-				   }
-
-				}
-
 
 				// acceptance corrections
 				h_JpsiAcceptance2D_num->Fill(eta_Jpsi, pt_Jpsi, MCweight);
