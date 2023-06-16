@@ -756,7 +756,7 @@ int PolarizationEffect(int PhotSystIdx = 0, const char* fileInMC = "/eos/cms/sto
 
 			double nTrack_inPV = ntracks_inEvent; //here use total ntrack, since unless there is reconstructed J/psi, we don't know what vertex to chose (total is the greatest PV)
 			double MCweight = h_weightPVtrk->GetBinContent(h_weightPVtrk->FindBin(nTrack_inPV));
-            MCweight *= polarizedWeight;
+			MCweight *= polarizedWeight;
 
 			double rap_Jpsi_corrections = rap_Jpsi; // rap_Jpsi not flipped, corrections yes
 			if (ispPb == true) { //direction dependent stuff
@@ -772,30 +772,13 @@ int PolarizationEffect(int PhotSystIdx = 0, const char* fileInMC = "/eos/cms/sto
 			else if (pt_Jpsi < 6.5) { MCweight = MCweight * WeightForMC_pTpart(6.5); }
 			else { MCweight = MCweight * WeightForMC_pTpart(pt_Jpsi); }
 
-			h_muonAcceptance2D_den->Fill(eta1, pt1, MCweight);
-			h_muonAcceptance2D_den->Fill(eta2, pt2, MCweight);
-			if (MuonAcceptance(eta1, pt1) == true) h_muonAcceptance2D_num->Fill(eta1, pt1, MCweight);
-			if (MuonAcceptance(eta2, pt2) == true) h_muonAcceptance2D_num->Fill(eta2, pt2, MCweight);
-
-			h_photAcceptance2D_den->Fill(eta_phot, pt_phot, MCweight);
-			if (PhotAcceptance(eta_phot, pt_phot) == true) h_photAcceptance2D_num->Fill(eta_phot, pt_phot, MCweight);
-
-			double eta_chi = gen_chic_eta->at(0);
-			double pt_chi = gen_chic_pt->at(0);
-			TLorentzVector* LVchic = (TLorentzVector*)gen_chic_p4->At(0);
-			double rap_chi = LVchic->Rapidity();
-
-			h_JpsiAcceptance2D_den->Fill(eta_Jpsi, pt_Jpsi, MCweight);
-			h_JpsiAcceptance2D_y_den->Fill(rap_Jpsi, pt_Jpsi, MCweight);
-			h_chiAcceptance2D_den->Fill(eta_chi, pt_chi, MCweight);
-			h_chiAcceptance2D_y_den->Fill(rap_chi, pt_chi, MCweight);
-
 			if (MuonAcceptance(eta1, pt1) == true && MuonAcceptance(eta2, pt2) == true && DimuonAcceptance(rap_Jpsi, pt_Jpsi) == true)
 			{
 
                // Total correction for chic/Jpsi ratio
-			   if (MuonSelectionPassMC(0) == true && MuonSelectionPassMC(1) == true && DimuonSelectionPassMC(0) == true){
-			
+			   if (MuonSelectionPassMC(0) == true && MuonSelectionPassMC(1) == true && DimuonSelectionPassMC(0) == true)
+			   {
+
 			       h_chiTotalCorrection1D_pT_all_den->Fill(pt_Jpsi, MCweight);
 			       h_chiTotalCorrection1D_y_den->Fill(rap_Jpsi, MCweight);
 			       if (fabs(rap_Jpsi) < 1.0) { h_chiTotalCorrection1D_nTrk_den->Fill(nTrack_inPV, MCweight); }
@@ -882,6 +865,29 @@ int PolarizationEffect(int PhotSystIdx = 0, const char* fileInMC = "/eos/cms/sto
 
 			   }
 
+			}
+
+
+			h_muonAcceptance2D_den->Fill(eta1, pt1, MCweight);
+			h_muonAcceptance2D_den->Fill(eta2, pt2, MCweight);
+			if (MuonAcceptance(eta1, pt1) == true) h_muonAcceptance2D_num->Fill(eta1, pt1, MCweight);
+			if (MuonAcceptance(eta2, pt2) == true) h_muonAcceptance2D_num->Fill(eta2, pt2, MCweight);
+
+			h_photAcceptance2D_den->Fill(eta_phot, pt_phot, MCweight);
+			if (PhotAcceptance(eta_phot, pt_phot) == true) h_photAcceptance2D_num->Fill(eta_phot, pt_phot, MCweight);
+
+			double eta_chi = gen_chic_eta->at(0);
+			double pt_chi = gen_chic_pt->at(0);
+			TLorentzVector* LVchic = (TLorentzVector*)gen_chic_p4->At(0);
+			double rap_chi = LVchic->Rapidity();
+
+			h_JpsiAcceptance2D_den->Fill(eta_Jpsi, pt_Jpsi, MCweight);
+			h_JpsiAcceptance2D_y_den->Fill(rap_Jpsi, pt_Jpsi, MCweight);
+			h_chiAcceptance2D_den->Fill(eta_chi, pt_chi, MCweight);
+			h_chiAcceptance2D_y_den->Fill(rap_chi, pt_chi, MCweight);
+
+            if (MuonAcceptance(eta1, pt1) == true && MuonAcceptance(eta2, pt2) == true && DimuonAcceptance(rap_Jpsi, pt_Jpsi) == true)
+			{
 				// acceptance corrections
 				h_JpsiAcceptance2D_num->Fill(eta_Jpsi, pt_Jpsi, MCweight);
 				h_JpsiAcceptance2D_y_num->Fill(rap_Jpsi, pt_Jpsi, MCweight);
@@ -985,6 +991,7 @@ int PolarizationEffect(int PhotSystIdx = 0, const char* fileInMC = "/eos/cms/sto
 					h_chiEfficiency1D_AnalysisBinning_y_den->Fill(rap_Jpsi_corrections, MCweight);
 					h_chiEfficiency1D_nTrack_den->Fill(nTrack_inPV, MCweight);
 				}
+
 			}
 
 
