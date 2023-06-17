@@ -450,7 +450,6 @@ int PolarizationStudy(double lambdaTheta1 = 0.50, double lambdaTheta2 = -0.39, c
 
 
 	// quick total correction:
-
 	h_chiTotalCorrection1D_pT_all_rat->Divide(h_chiTotalCorrection1D_pT_all_num, h_chiTotalCorrection1D_pT_all_den, 1, 1, "B");
 	h_chiTotalCorrection1D_y_rat->Divide(h_chiTotalCorrection1D_y_num, h_chiTotalCorrection1D_y_den, 1, 1, "B");
 	h_chiTotalCorrection1D_nTrk_rat->Divide(h_chiTotalCorrection1D_nTrk_num, h_chiTotalCorrection1D_nTrk_den, 1, 1, "B");
@@ -489,58 +488,6 @@ int PolarizationStudy(double lambdaTheta1 = 0.50, double lambdaTheta2 = -0.39, c
 	h_chiTotCorrChic1toChic2_1D_pT_fwdCMS_rat->Divide(h_chiTotCorrChic1_1D_pT_fwdCMS_rat, h_chiTotCorrChic2_1D_pT_fwdCMS_rat, 1, 1);
 	h_chiTotCorrChic1toChic2_1D_pT_bkwCMS_rat->Divide(h_chiTotCorrChic1_1D_pT_bkwCMS_rat, h_chiTotCorrChic2_1D_pT_bkwCMS_rat, 1, 1);
 
-
-
-	// quick nominal efficency corrections:
-	
-
-
-	h_muonAcceptance2D_rat->Divide(h_muonAcceptance2D_num, h_muonAcceptance2D_den);
-	h_photAcceptance2D_rat->Divide(h_photAcceptance2D_num, h_photAcceptance2D_den);
-	h_JpsiAcceptance2D_rat->Divide(h_JpsiAcceptance2D_num, h_JpsiAcceptance2D_den);
-	h_JpsiAcceptance2D_y_rat->Divide(h_JpsiAcceptance2D_y_num, h_JpsiAcceptance2D_y_den);
-	h_chiAcceptance2D_rat->Divide(h_chiAcceptance2D_num, h_chiAcceptance2D_den);
-	h_chiAcceptance2D_y_rat->Divide(h_chiAcceptance2D_y_num, h_chiAcceptance2D_y_den);
-
-	h_muonEfficiency2D_rat->Divide(h_muonEfficiency2D_num, h_muonEfficiency2D_den);
-	h_muonEfficiency2D_ratGrahamGlobal->Divide(h_muonEfficiency2D_numGrahamGlobal, h_muonEfficiency2D_den);
-	h_photEfficiency2D_rat->Divide(h_photEfficiency2D_num, h_photEfficiency2D_den);
-	h_JpsiEfficiency2D_y_rat->Divide(h_JpsiEfficiency2D_y_num, h_JpsiEfficiency2D_y_den);
-	h_chiEfficiency2D_y_rat->Divide(h_chiEfficiency2D_y_num, h_chiEfficiency2D_y_den);
-
-
-	h_photEfficiency1D_rat->Divide(h_photEfficiency1D_num, h_photEfficiency1D_den, 1, 1, "B");
-	h_JpsiEfficiency1D_rat->Divide(h_JpsiEfficiency1D_num, h_JpsiEfficiency1D_den, 1, 1, "B");
-	h_chiEfficiency1D_rat->Divide(h_chiEfficiency1D_num, h_chiEfficiency1D_den, 1, 1, "B");
-	h_chiEfficiency1D_AnalysisBinning_rat->Divide(h_chiEfficiency1D_AnalysisBinning_num, h_chiEfficiency1D_AnalysisBinning_den, 1, 1, "B");
-
-	h_photEfficiency1D_y_rat->Divide(h_photEfficiency1D_y_num, h_photEfficiency1D_y_den, 1, 1, "B");
-	h_JpsiEfficiency1D_y_rat->Divide(h_JpsiEfficiency1D_y_num, h_JpsiEfficiency1D_y_den, 1, 1, "B");
-	h_chiEfficiency1D_y_rat->Divide(h_chiEfficiency1D_y_num, h_chiEfficiency1D_y_den, 1, 1, "B");
-	h_chiEfficiency1D_AnalysisBinning_y_rat->Divide(h_chiEfficiency1D_AnalysisBinning_y_num, h_chiEfficiency1D_AnalysisBinning_y_den, 1, 1, "B");
-
-
-
-	h_photEfficiency1D_nTrack_rat->Divide(h_photEfficiency1D_nTrack_num, h_photEfficiency1D_nTrack_den, 1, 1, "B");
-	h_JpsiEfficiency1D_nTrack_rat->Divide(h_JpsiEfficiency1D_nTrack_num, h_JpsiEfficiency1D_nTrack_den, 1, 1, "B");
-	h_chiEfficiency1D_nTrack_rat->Divide(h_chiEfficiency1D_nTrack_num, h_chiEfficiency1D_nTrack_den, 1, 1, "B");
-
-
-	h_JpsiAccEff_rat->Divide(h_JpsiAccEff_num, h_JpsiAccEff_den);
-	h_JpsiAccEff_rat_nTrk->Divide(h_JpsiAccEff_num_nTrk, h_JpsiAccEff_den_nTrk);
-	h_chiAccEff_rat->Divide(h_chiAccEff_num, h_chiAccEff_den);
-	h_chiAccEff_rat_nTrk->Divide(h_chiAccEff_num_nTrk, h_chiAccEff_den_nTrk);
-
-	TCanvas* can1 = new TCanvas("can1", "plot", 1200, 800);
-	h_muonAcceptance2D_num->Draw("colz");
-	TF1* f_filter = new TF1("f_filter", "3.3/TMath::CosH(x)", -2.5, 2.5);
-	f_filter->SetLineColor(kBlue);
-	f_filter->Draw("same");
-	TF1* f_acceptance = new TF1("f_acceptance","(fabs(x) > 2.4)*100+((fabs(x) < 0.3)*3.4 + (fabs(x)>=0.3)*(fabs(x)<1.1)*3.3 + (fabs(x)>=1.1)*(fabs(x)<2.1)*(5.5-2.0*fabs(x))+(fabs(x)>=2.1)*1.3)",-2.5,2.5);
-	//TF1* f_acceptance = new TF1("f_acceptance","(fabs(x) > 2.4)*100+((fabs(x) < 0.8)*3.3 + (fabs(x)>=0.8)*(fabs(x)<1.5)*(5.81-3.14*fabs(x))+(fabs(x)>=1.5)*(fabs(x)<2.07)*(1.89-0.526*fabs(x))+(fabs(x)>=2.07)*0.8)",-2.5,2.5);
-	f_acceptance->Draw("same");
-	//can1->SaveAs("muonAcceptance2D_num.png");
-	
 
 
 
