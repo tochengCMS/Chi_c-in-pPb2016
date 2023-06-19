@@ -58,19 +58,39 @@ int weird_decay_counter = 0;
 double bins_Q_pT[] = { 6.5, 9, 12, 18, 30 };
 int  nbins_Q_pT = sizeof(bins_Q_pT) / sizeof(double) - 1;
 
-double bins_Q_y[] = { -2.4, -1.6, -1.0, 0, 1.0, 1.6, 2.4 };
-int  nbins_Q_y = sizeof(bins_Q_y) / sizeof(double) - 1;
+void effMulti(TH1D* h1, TH1D* h2, TH1D* output){
 
-double binsWeightChi_pT[] = { 6.5, 9, 12, 18, 30 };
-int  nbinsWeightChi_pT = sizeof(binsWeightChi_pT) / sizeof(double) - 1;
-double binsWeightChi_absy[] = { 0.0, 1.0, 1.6, 2.4 };
-int  nbinsWeightChi_absy = sizeof(binsWeightChi_absy) / sizeof(double) - 1;
+    for (unsigned int i = 0; i < h1->GetNbinsX(); i++) { 
 
-double binsWeightChi_nTrk[] = { 0, 50, 100, 150, 250, 400 };
-int  nbinsWeightChi_nTrk = sizeof(binsWeightChi_nTrk) / sizeof(double) - 1;
+         double bin_content = h1->GetBinContent(i+1)*h2->GetBinContent(i+1);
+		 double bin_error = h1->GetBinContent(i+1)*h1->GetBinContent(i+1)*h2->GetBinError(i+1)*h2->GetBinError(i+1);
+		        bin_error += h2->GetBinContent(i+1)*h2->GetBinContent(i+1)*h1->GetBinError(i+1)*h1->GetBinError(i+1);
+				bin_error = TMath::Sqrt(bin_error);
+	     output->SetBinContent(i+1,bin_content);
+		 output->SetBinError(i+1,bin_error);			
+         
+	}		
 
+}
 
-int PolarizationStudy(double lambdaTheta1 = 0.50, double lambdaTheta2 = -0.39, const char* fileOut = "Chic_PolarizationStudy_vTest-bothDir.root", int PhotSystIdx = 0, const char* fileInMC = "/eos/cms/store/group/phys_heavyions/okukral/Chi_c/Chi_c_pPb8TeV_MC-Official_v3-bothDir.root", const char* fileInMCNoFilter = "/eos/cms/store/group/phys_heavyions/okukral/Chi_c/Chi_c_pPb8TeV_MC_noFilter.root", const char* fileMCWeight = "MCWeight_v2.root")
+void effMultiNtrk(TH1D* hNtrk, TH1D* h, TH1D* output){
+
+    double effNtrk = hNtrk->GetBinContent(1);
+    double effNtrkErr = hNtrk->GetBinError(1);	
+    for (unsigned int i = 0; i < h->GetNbinsX(); i++) { 
+
+         double bin_content = effNtrk*h->GetBinContent(i+1);
+		 double bin_error = effNtrkErr*effNtrkErr*h->GetBinContent(i+1)*h->GetBinContent(i+1);
+		        bin_error += h->GetBinError(i+1)*h->GetBinError(i+1)*effNtrk*effNtrk;
+				bin_error = TMath::Sqrt(bin_error);
+	     output->SetBinContent(i+1,bin_content);
+		 output->SetBinError(i+1,bin_error);			
+         
+	}		
+
+}
+
+int PolarizationStudy(double lambdaTheta1 = 0.00, double lambdaTheta2 = 0.00, const char* fileOut = "Chic_PolarizationStudy_vTest-bothDir.root", int PhotSystIdx = 0, const char* fileInMC = "/eos/cms/store/group/phys_heavyions/okukral/Chi_c/Chi_c_pPb8TeV_MC-Official_v3-bothDir.root", const char* fileInMCNoFilter = "/eos/cms/store/group/phys_heavyions/okukral/Chi_c/Chi_c_pPb8TeV_MC_noFilter.root", const char* fileMCWeight = "MCWeight_v2.root")
 {
 	//int PhotSystIdx = 0;
 	
@@ -100,9 +120,9 @@ int PolarizationStudy(double lambdaTheta1 = 0.50, double lambdaTheta2 = -0.39, c
 	TH1D* h_chiCorrectionMuonAcceptance1D_y_num = new TH1D("h_chiCorrectionMuonAcceptance1D_y_num", "h_chiCorrectionMuonAcceptance1D_y_num; y", nbins_y, bins_y);
 	TH1D* h_chiCorrectionMuonAcceptance1D_y_rat = new TH1D("h_chiCorrectionMuonAcceptance1D_y_rat", "h_chiCorrectionMuonAcceptance1D_y_rat; y", nbins_y, bins_y);
 
-	TH1D* h_chiCorrectionMuonAcceptance1D_nTrk_all_den = new TH1D("h_chiCorrectionMuonAcceptance1D_nTrk_all_den", "h_chiCorrectionMuonAcceptance1D_nTrk_all_den; nTrk", nbins_nTrk, bins_nTrk);
-	TH1D* h_chiCorrectionMuonAcceptance1D_nTrk_all_num = new TH1D("h_chiCorrectionMuonAcceptance1D_nTrk_all_num", "h_chiCorrectionMuonAcceptance1D_nTrk_all_num; nTrk", nbins_nTrk, bins_nTrk);
-	TH1D* h_chiCorrectionMuonAcceptance1D_nTrk_all_rat = new TH1D("h_chiCorrectionMuonAcceptance1D_nTrk_all_rat", "h_chiCorrectionMuonAcceptance1D_nTrk_all_rat; nTrk", nbins_nTrk, bins_nTrk);
+	TH1D* h_chiCorrectionMuonAcceptance1D_nTrk_all_den = new TH1D("h_chiCorrectionMuonAcceptance1D_nTrk_all_den", "h_chiCorrectionMuonAcceptance1D_nTrk_all_den; nTrk", 1,0,400);//nbins_nTrk, bins_nTrk);
+	TH1D* h_chiCorrectionMuonAcceptance1D_nTrk_all_num = new TH1D("h_chiCorrectionMuonAcceptance1D_nTrk_all_num", "h_chiCorrectionMuonAcceptance1D_nTrk_all_num; nTrk", 1,0,400);//nbins_nTrk, bins_nTrk);
+	TH1D* h_chiCorrectionMuonAcceptance1D_nTrk_all_rat = new TH1D("h_chiCorrectionMuonAcceptance1D_nTrk_all_rat", "h_chiCorrectionMuonAcceptance1D_nTrk_all_rat; nTrk", 1,0,400);//nbins_nTrk, bins_nTrk);
 
 	TH1D* h_chiCorrectionMuonAcceptance1D_pT_midCMS_den = new TH1D("h_chiCorrectionMuonAcceptance1D_pT_midCMS_den", "h_chiCorrectionMuonAcceptance1D_pT_midCMS_den; p_{T}", nbins_pT, bins_pT);
 	TH1D* h_chiCorrectionMuonAcceptance1D_pT_midCMS_num = new TH1D("h_chiCorrectionMuonAcceptance1D_pT_midCMS_num", "h_chiCorrectionMuonAcceptance1D_pT_midCMS_num; p_{T}", nbins_pT, bins_pT);
@@ -144,9 +164,9 @@ int PolarizationStudy(double lambdaTheta1 = 0.50, double lambdaTheta2 = -0.39, c
 	TH1D* h_chiCorrMuonAcceptanceChic1_1D_y_num = new TH1D("h_chiCorrMuonAcceptanceChic1_1D_y_num", "h_chiCorrMuonAcceptanceChic1_1D_y_num; y", nbins_y, bins_y);
 	TH1D* h_chiCorrMuonAcceptanceChic1_1D_y_rat = new TH1D("h_chiCorrMuonAcceptanceChic1_1D_y_rat", "h_chiCorrMuonAcceptanceChic1_1D_y_rat; y", nbins_y, bins_y);
 
-	TH1D* h_chiCorrMuonAcceptanceChic1_1D_nTrk_all_den = new TH1D("h_chiCorrMuonAcceptanceChic1_1D_nTrk_all_den", "h_chiCorrMuonAcceptanceChic1_1D_nTrk_all_den; nTrk", nbins_nTrk, bins_nTrk);
-	TH1D* h_chiCorrMuonAcceptanceChic1_1D_nTrk_all_num = new TH1D("h_chiCorrMuonAcceptanceChic1_1D_nTrk_all_num", "h_chiCorrMuonAcceptanceChic1_1D_nTrk_all_num; nTrk", nbins_nTrk, bins_nTrk);
-	TH1D* h_chiCorrMuonAcceptanceChic1_1D_nTrk_all_rat = new TH1D("h_chiCorrMuonAcceptanceChic1_1D_nTrk_all_rat", "h_chiCorrMuonAcceptanceChic1_1D_nTrk_all_rat; nTrk", nbins_nTrk, bins_nTrk);
+	TH1D* h_chiCorrMuonAcceptanceChic1_1D_nTrk_all_den = new TH1D("h_chiCorrMuonAcceptanceChic1_1D_nTrk_all_den", "h_chiCorrMuonAcceptanceChic1_1D_nTrk_all_den; nTrk", 1,0,400);//nbins_nTrk, bins_nTrk);
+	TH1D* h_chiCorrMuonAcceptanceChic1_1D_nTrk_all_num = new TH1D("h_chiCorrMuonAcceptanceChic1_1D_nTrk_all_num", "h_chiCorrMuonAcceptanceChic1_1D_nTrk_all_num; nTrk", 1,0,400);//nbins_nTrk, bins_nTrk);
+	TH1D* h_chiCorrMuonAcceptanceChic1_1D_nTrk_all_rat = new TH1D("h_chiCorrMuonAcceptanceChic1_1D_nTrk_all_rat", "h_chiCorrMuonAcceptanceChic1_1D_nTrk_all_rat; nTrk", 1,0,400);//nbins_nTrk, bins_nTrk);
 
 	TH1D* h_chiCorrMuonAcceptanceChic1_1D_pT_midCMS_den = new TH1D("h_chiCorrMuonAcceptanceChic1_1D_pT_midCMS_den", "h_chiCorrMuonAcceptanceChic1_1D_pT_midCMS_den; p_{T}", nbins_pT, bins_pT);
 	TH1D* h_chiCorrMuonAcceptanceChic1_1D_pT_midCMS_num = new TH1D("h_chiCorrMuonAcceptanceChic1_1D_pT_midCMS_num", "h_chiCorrMuonAcceptanceChic1_1D_pT_midCMS_num; p_{T}", nbins_pT, bins_pT);
@@ -185,9 +205,9 @@ int PolarizationStudy(double lambdaTheta1 = 0.50, double lambdaTheta2 = -0.39, c
 	TH1D* h_chiCorrMuonAcceptanceChic2_1D_y_num = new TH1D("h_chiCorrMuonAcceptanceChic2_1D_y_num", "h_chiCorrMuonAcceptanceChic2_1D_y_num; y", nbins_y, bins_y);
 	TH1D* h_chiCorrMuonAcceptanceChic2_1D_y_rat = new TH1D("h_chiCorrMuonAcceptanceChic2_1D_y_rat", "h_chiCorrMuonAcceptanceChic2_1D_y_rat; y", nbins_y, bins_y);
 
-	TH1D* h_chiCorrMuonAcceptanceChic2_1D_nTrk_all_den = new TH1D("h_chiCorrMuonAcceptanceChic2_1D_nTrk_all_den", "h_chiCorrMuonAcceptanceChic2_1D_nTrk_all_den; nTrk", nbins_nTrk, bins_nTrk);
-	TH1D* h_chiCorrMuonAcceptanceChic2_1D_nTrk_all_num = new TH1D("h_chiCorrMuonAcceptanceChic2_1D_nTrk_all_num", "h_chiCorrMuonAcceptanceChic2_1D_nTrk_all_num; nTrk", nbins_nTrk, bins_nTrk);
-	TH1D* h_chiCorrMuonAcceptanceChic2_1D_nTrk_all_rat = new TH1D("h_chiCorrMuonAcceptanceChic2_1D_nTrk_all_rat", "h_chiCorrMuonAcceptanceChic2_1D_nTrk_all_rat; nTrk", nbins_nTrk, bins_nTrk);
+	TH1D* h_chiCorrMuonAcceptanceChic2_1D_nTrk_all_den = new TH1D("h_chiCorrMuonAcceptanceChic2_1D_nTrk_all_den", "h_chiCorrMuonAcceptanceChic2_1D_nTrk_all_den; nTrk", 1,0,400);//nbins_nTrk, bins_nTrk);
+	TH1D* h_chiCorrMuonAcceptanceChic2_1D_nTrk_all_num = new TH1D("h_chiCorrMuonAcceptanceChic2_1D_nTrk_all_num", "h_chiCorrMuonAcceptanceChic2_1D_nTrk_all_num; nTrk", 1,0,400);//nbins_nTrk, bins_nTrk);
+	TH1D* h_chiCorrMuonAcceptanceChic2_1D_nTrk_all_rat = new TH1D("h_chiCorrMuonAcceptanceChic2_1D_nTrk_all_rat", "h_chiCorrMuonAcceptanceChic2_1D_nTrk_all_rat; nTrk", 1,0,400);//nbins_nTrk, bins_nTrk);
 
 	TH1D* h_chiCorrMuonAcceptanceChic2_1D_pT_midCMS_den = new TH1D("h_chiCorrMuonAcceptanceChic2_1D_pT_midCMS_den", "h_chiCorrMuonAcceptanceChic2_1D_pT_midCMS_den; p_{T}", nbins_pT, bins_pT);
 	TH1D* h_chiCorrMuonAcceptanceChic2_1D_pT_midCMS_num = new TH1D("h_chiCorrMuonAcceptanceChic2_1D_pT_midCMS_num", "h_chiCorrMuonAcceptanceChic2_1D_pT_midCMS_num; p_{T}", nbins_pT, bins_pT);
@@ -220,7 +240,7 @@ int PolarizationStudy(double lambdaTheta1 = 0.50, double lambdaTheta2 = -0.39, c
 
 	TH1D* h_chiCorrMuonAcceptanceChic1toChic2_1D_pT_all_rat = new TH1D("h_chiCorrMuonAcceptanceChic1toChic2_1D_pT_all_rat", "h_chiCorrMuonAcceptanceChic1toChic2_1D_pT_all_rat; p_{T}", nbins_pT, bins_pT);
 	TH1D* h_chiCorrMuonAcceptanceChic1toChic2_1D_y_rat = new TH1D("h_chiCorrMuonAcceptanceChic1toChic2_1D_y_rat", "h_chiCorrMuonAcceptanceChic1toChic2_1D_y_rat; y", nbins_y, bins_y);
-	TH1D* h_chiCorrMuonAcceptanceChic1toChic2_1D_nTrk_all_rat = new TH1D("h_chiCorrMuonAcceptanceChic1toChic2_1D_nTrk_all_rat", "h_chiCorrMuonAcceptanceChic1toChic2_1D_nTrk_all_rat; nTrk", nbins_nTrk, bins_nTrk);
+	TH1D* h_chiCorrMuonAcceptanceChic1toChic2_1D_nTrk_all_rat = new TH1D("h_chiCorrMuonAcceptanceChic1toChic2_1D_nTrk_all_rat", "h_chiCorrMuonAcceptanceChic1toChic2_1D_nTrk_all_rat; nTrk", 1,0,400);//nbins_nTrk, bins_nTrk);
 	TH1D* h_chiCorrMuonAcceptanceChic1toChic2_1D_pT_midCMS_rat = new TH1D("h_chiCorrMuonAcceptanceChic1toChic2_1D_pT_midCMS_rat", "h_chiCorrMuonAcceptanceChic1toChic2_1D_pT_midCMS_rat; p_{T}", nbins_pT, bins_pT);
 	TH1D* h_chiCorrMuonAcceptanceChic1toChic2_1D_pT_fwdCMS_rat = new TH1D("h_chiCorrMuonAcceptanceChic1toChic2_1D_pT_fwdCMS_rat", "h_chiCorrMuonAcceptanceChic1toChic2_1D_pT_fwdCMS_rat; p_{T}", nbins_pT, bins_pT);
 	TH1D* h_chiCorrMuonAcceptanceChic1toChic2_1D_pT_bkwCMS_rat = new TH1D("h_chiCorrMuonAcceptanceChic1toChic2_1D_pT_bkwCMS_rat", "h_chiCorrMuonAcceptanceChic1toChic2_1D_pT_bkwCMS_rat; p_{T}", nbins_pT, bins_pT);
@@ -374,193 +394,39 @@ int PolarizationStudy(double lambdaTheta1 = 0.50, double lambdaTheta2 = -0.39, c
 
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 	/////////////////////////////
 	//  TOTAL CORRECTION  //////
 	///////////////////////////
 
-	TH1D* h_chiTotalCorrection1D_pT_all_den = new TH1D("h_chiTotalCorrection1D_pT_all_den", "h_chiTotalCorrection1D_pT_all_den; p_{T}", nbins_pT, bins_pT);
-	TH1D* h_chiTotalCorrection1D_pT_all_num = new TH1D("h_chiTotalCorrection1D_pT_all_num", "h_chiTotalCorrection1D_pT_all_num; p_{T}", nbins_pT, bins_pT);
 	TH1D* h_chiTotalCorrection1D_pT_all_rat = new TH1D("h_chiTotalCorrection1D_pT_all_rat", "h_chiTotalCorrection1D_pT_all_rat; p_{T}", nbins_pT, bins_pT);
-
-	TH1D* h_chiTotalCorrection1D_y_den = new TH1D("h_chiTotalCorrection1D_y_den", "h_chiTotalCorrection1D_y_den; y", nbins_y, bins_y);
-	TH1D* h_chiTotalCorrection1D_y_num = new TH1D("h_chiTotalCorrection1D_y_num", "h_chiTotalCorrection1D_y_num; y", nbins_y, bins_y);
 	TH1D* h_chiTotalCorrection1D_y_rat = new TH1D("h_chiTotalCorrection1D_y_rat", "h_chiTotalCorrection1D_y_rat; y", nbins_y, bins_y);
-
-	TH1D* h_chiTotalCorrection1D_nTrk_den = new TH1D("h_chiTotalCorrection1D_nTrk_den", "h_chiTotalCorrection1D_nTrk_den; nTrk", nbins_nTrk, bins_nTrk);
-	TH1D* h_chiTotalCorrection1D_nTrk_num = new TH1D("h_chiTotalCorrection1D_nTrk_num", "h_chiTotalCorrection1D_nTrk_num; nTrk", nbins_nTrk, bins_nTrk);
 	TH1D* h_chiTotalCorrection1D_nTrk_rat = new TH1D("h_chiTotalCorrection1D_nTrk_rat", "h_chiTotalCorrection1D_nTrk_rat; nTrk", nbins_nTrk, bins_nTrk);
-
-	TH1D* h_chiTotalCorrection1D_nTrk_all_den = new TH1D("h_chiTotalCorrection1D_nTrk_all_den", "h_chiTotalCorrection1D_nTrk_all_den; nTrk", nbins_nTrk, bins_nTrk);
-	TH1D* h_chiTotalCorrection1D_nTrk_all_num = new TH1D("h_chiTotalCorrection1D_nTrk_all_num", "h_chiTotalCorrection1D_nTrk_all_num; nTrk", nbins_nTrk, bins_nTrk);
 	TH1D* h_chiTotalCorrection1D_nTrk_all_rat = new TH1D("h_chiTotalCorrection1D_nTrk_all_rat", "h_chiTotalCorrection1D_nTrk_all_rat; nTrk", nbins_nTrk, bins_nTrk);
-
-	TH1D* h_chiTotalCorrection1D_pT_mid_den = new TH1D("h_chiTotalCorrection1D_pT_mid_den", "h_chiTotalCorrection1D_pT_mid_den; p_{T}", nbins_pT, bins_pT);
-	TH1D* h_chiTotalCorrection1D_pT_mid_num = new TH1D("h_chiTotalCorrection1D_pT_mid_num", "h_chiTotalCorrection1D_pT_mid_num; p_{T}", nbins_pT, bins_pT);
-	TH1D* h_chiTotalCorrection1D_pT_mid_rat = new TH1D("h_chiTotalCorrection1D_pT_mid_rat", "h_chiTotalCorrection1D_pT_mid_rat; p_{T}", nbins_pT, bins_pT);
-
-	TH1D* h_chiTotalCorrection1D_pT_fwd_den = new TH1D("h_chiTotalCorrection1D_pT_fwd_den", "h_chiTotalCorrection1D_pT_fwd_den; p_{T}", nbins_pT, bins_pT);
-	TH1D* h_chiTotalCorrection1D_pT_fwd_num = new TH1D("h_chiTotalCorrection1D_pT_fwd_num", "h_chiTotalCorrection1D_pT_fwd_num; p_{T}", nbins_pT, bins_pT);
-	TH1D* h_chiTotalCorrection1D_pT_fwd_rat = new TH1D("h_chiTotalCorrection1D_pT_fwd_rat", "h_chiTotalCorrection1D_pT_fwd_rat; p_{T}", nbins_pT, bins_pT);
-
-	TH1D* h_chiTotalCorrection1D_pT_fwdOnly_den = new TH1D("h_chiTotalCorrection1D_pT_fwdOnly_den", "h_chiTotalCorrection1D_pT_fwdOnly_den; p_{T}", nbins_pT, bins_pT);
-	TH1D* h_chiTotalCorrection1D_pT_fwdOnly_num = new TH1D("h_chiTotalCorrection1D_pT_fwdOnly_num", "h_chiTotalCorrection1D_pT_fwdOnly_num; p_{T}", nbins_pT, bins_pT);
-	TH1D* h_chiTotalCorrection1D_pT_fwdOnly_rat = new TH1D("h_chiTotalCorrection1D_pT_fwdOnly_rat", "h_chiTotalCorrection1D_pT_fwdOnly_rat; p_{T}", nbins_pT, bins_pT);
-
-	TH1D* h_chiTotalCorrection1D_pT_bkwOnly_den = new TH1D("h_chiTotalCorrection1D_pT_bkwOnly_den", "h_chiTotalCorrection1D_pT_bkwOnly_den; p_{T}", nbins_pT, bins_pT);
-	TH1D* h_chiTotalCorrection1D_pT_bkwOnly_num = new TH1D("h_chiTotalCorrection1D_pT_bkwOnly_num", "h_chiTotalCorrection1D_pT_bkwOnly_num; p_{T}", nbins_pT, bins_pT);
-	TH1D* h_chiTotalCorrection1D_pT_bkwOnly_rat = new TH1D("h_chiTotalCorrection1D_pT_bkwOnly_rat", "h_chiTotalCorrection1D_pT_bkwOnly_rat; p_{T}", nbins_pT, bins_pT);
-
-	TH1D* h_chiTotalCorrection1D_pT_fwdOnlyWide_den = new TH1D("h_chiTotalCorrection1D_pT_fwdOnlyWide_den", "h_chiTotalCorrection1D_pT_fwdOnlyWide_den; p_{T}", nbins_pT, bins_pT);
-	TH1D* h_chiTotalCorrection1D_pT_fwdOnlyWide_num = new TH1D("h_chiTotalCorrection1D_pT_fwdOnlyWide_num", "h_chiTotalCorrection1D_pT_fwdOnlyWide_num; p_{T}", nbins_pT, bins_pT);
-	TH1D* h_chiTotalCorrection1D_pT_fwdOnlyWide_rat = new TH1D("h_chiTotalCorrection1D_pT_fwdOnlyWide_rat", "h_chiTotalCorrection1D_pT_fwdOnlyWide_rat; p_{T}", nbins_pT, bins_pT);
-
-	TH1D* h_chiTotalCorrection1D_pT_bkwOnlyWide_den = new TH1D("h_chiTotalCorrection1D_pT_bkwOnlyWide_den", "h_chiTotalCorrection1D_pT_bkwOnlyWide_den; p_{T}", nbins_pT, bins_pT);
-	TH1D* h_chiTotalCorrection1D_pT_bkwOnlyWide_num = new TH1D("h_chiTotalCorrection1D_pT_bkwOnlyWide_num", "h_chiTotalCorrection1D_pT_bkwOnlyWide_num; p_{T}", nbins_pT, bins_pT);
-	TH1D* h_chiTotalCorrection1D_pT_bkwOnlyWide_rat = new TH1D("h_chiTotalCorrection1D_pT_bkwOnlyWide_rat", "h_chiTotalCorrection1D_pT_bkwOnlyWide_rat; p_{T}", nbins_pT, bins_pT);
-
-	TH1D* h_chiTotalCorrection1D_pT_midCMS_den = new TH1D("h_chiTotalCorrection1D_pT_midCMS_den", "h_chiTotalCorrection1D_pT_midCMS_den; p_{T}", nbins_pT, bins_pT);
-	TH1D* h_chiTotalCorrection1D_pT_midCMS_num = new TH1D("h_chiTotalCorrection1D_pT_midCMS_num", "h_chiTotalCorrection1D_pT_midCMS_num; p_{T}", nbins_pT, bins_pT);
 	TH1D* h_chiTotalCorrection1D_pT_midCMS_rat = new TH1D("h_chiTotalCorrection1D_pT_midCMS_rat", "h_chiTotalCorrection1D_pT_midCMS_rat; p_{T}", nbins_pT, bins_pT);
-
-	TH1D* h_chiTotalCorrection1D_pT_fwdCMS_den = new TH1D("h_chiTotalCorrection1D_pT_fwdCMS_den", "h_chiTotalCorrection1D_pT_fwdCMS_den; p_{T}", nbins_pT, bins_pT);
-	TH1D* h_chiTotalCorrection1D_pT_fwdCMS_num = new TH1D("h_chiTotalCorrection1D_pT_fwdCMS_num", "h_chiTotalCorrection1D_pT_fwdCMS_num; p_{T}", nbins_pT, bins_pT);
 	TH1D* h_chiTotalCorrection1D_pT_fwdCMS_rat = new TH1D("h_chiTotalCorrection1D_pT_fwdCMS_rat", "h_chiTotalCorrection1D_pT_fwdCMS_rat; p_{T}", nbins_pT, bins_pT);
-
-	TH1D* h_chiTotalCorrection1D_pT_bkwCMS_den = new TH1D("h_chiTotalCorrection1D_pT_bkwCMS_den", "h_chiTotalCorrection1D_pT_bkwCMS_den; p_{T}", nbins_pT, bins_pT);
-	TH1D* h_chiTotalCorrection1D_pT_bkwCMS_num = new TH1D("h_chiTotalCorrection1D_pT_bkwCMS_num", "h_chiTotalCorrection1D_pT_bkwCMS_num; p_{T}", nbins_pT, bins_pT);
 	TH1D* h_chiTotalCorrection1D_pT_bkwCMS_rat = new TH1D("h_chiTotalCorrection1D_pT_bkwCMS_rat", "h_chiTotalCorrection1D_pT_bkwCMS_rat; p_{T}", nbins_pT, bins_pT);
-
-	h_chiTotalCorrection1D_pT_all_den->Sumw2();
-	h_chiTotalCorrection1D_y_den->Sumw2();
-	h_chiTotalCorrection1D_nTrk_den->Sumw2();
-	h_chiTotalCorrection1D_nTrk_all_den->Sumw2();
-	h_chiTotalCorrection1D_pT_mid_den->Sumw2();
-	h_chiTotalCorrection1D_pT_fwd_den->Sumw2();
-	h_chiTotalCorrection1D_pT_fwdOnly_den->Sumw2();
-	h_chiTotalCorrection1D_pT_bkwOnly_den->Sumw2();
-	h_chiTotalCorrection1D_pT_fwdOnlyWide_den->Sumw2();
-	h_chiTotalCorrection1D_pT_bkwOnlyWide_den->Sumw2();
-	h_chiTotalCorrection1D_pT_midCMS_den->Sumw2();
-	h_chiTotalCorrection1D_pT_fwdCMS_den->Sumw2();
-	h_chiTotalCorrection1D_pT_bkwCMS_den->Sumw2();
-
-	h_chiTotalCorrection1D_pT_all_num->Sumw2();
-	h_chiTotalCorrection1D_y_num->Sumw2();
-	h_chiTotalCorrection1D_nTrk_num->Sumw2();
-	h_chiTotalCorrection1D_nTrk_all_num->Sumw2();
-	h_chiTotalCorrection1D_pT_mid_num->Sumw2();
-	h_chiTotalCorrection1D_pT_fwd_num->Sumw2();
-	h_chiTotalCorrection1D_pT_fwdOnly_num->Sumw2();
-	h_chiTotalCorrection1D_pT_bkwOnly_num->Sumw2();
-	h_chiTotalCorrection1D_pT_fwdOnlyWide_num->Sumw2();
-	h_chiTotalCorrection1D_pT_bkwOnlyWide_num->Sumw2();
-	h_chiTotalCorrection1D_pT_midCMS_num->Sumw2();
-	h_chiTotalCorrection1D_pT_fwdCMS_num->Sumw2();
-	h_chiTotalCorrection1D_pT_bkwCMS_num->Sumw2();
-
 
 	///////////////////////////////////////////////
 	//  TOTAL CORRECTION RATIO (CHIC1/CHIC2) //////
 	//////////////////////////////////////////////
 
 	/////////////////HISTOGRAM OF CHIC1////////////////////////
-
-	TH1D* h_chiTotCorrChic1_1D_pT_all_den = new TH1D("h_chiTotCorrChic1_1D_pT_all_den", "h_chiTotCorrChic1_1D_pT_all_den; p_{T}", nbins_pT, bins_pT);
-	TH1D* h_chiTotCorrChic1_1D_pT_all_num = new TH1D("h_chiTotCorrChic1_1D_pT_all_num", "h_chiTotCorrChic1_1D_pT_all_num; p_{T}", nbins_pT, bins_pT);
 	TH1D* h_chiTotCorrChic1_1D_pT_all_rat = new TH1D("h_chiTotCorrChic1_1D_pT_all_rat", "h_chiTotCorrChic1_1D_pT_all_rat; p_{T}", nbins_pT, bins_pT);
-
-	TH1D* h_chiTotCorrChic1_1D_y_den = new TH1D("h_chiTotCorrChic1_1D_y_den", "h_chiTotCorrChic1_1D_y_den; y", nbins_y, bins_y);
-	TH1D* h_chiTotCorrChic1_1D_y_num = new TH1D("h_chiTotCorrChic1_1D_y_num", "h_chiTotCorrChic1_1D_y_num; y", nbins_y, bins_y);
 	TH1D* h_chiTotCorrChic1_1D_y_rat = new TH1D("h_chiTotCorrChic1_1D_y_rat", "h_chiTotCorrChic1_1D_y_rat; y", nbins_y, bins_y);
-
-	TH1D* h_chiTotCorrChic1_1D_nTrk_all_den = new TH1D("h_chiTotCorrChic1_1D_nTrk_all_den", "h_chiTotCorrChic1_1D_nTrk_all_den; nTrk", nbins_nTrk, bins_nTrk);
-	TH1D* h_chiTotCorrChic1_1D_nTrk_all_num = new TH1D("h_chiTotCorrChic1_1D_nTrk_all_num", "h_chiTotCorrChic1_1D_nTrk_all_num; nTrk", nbins_nTrk, bins_nTrk);
 	TH1D* h_chiTotCorrChic1_1D_nTrk_all_rat = new TH1D("h_chiTotCorrChic1_1D_nTrk_all_rat", "h_chiTotCorrChic1_1D_nTrk_all_rat; nTrk", nbins_nTrk, bins_nTrk);
-
-	TH1D* h_chiTotCorrChic1_1D_pT_midCMS_den = new TH1D("h_chiTotCorrChic1_1D_pT_midCMS_den", "h_chiTotCorrChic1_1D_pT_midCMS_den; p_{T}", nbins_pT, bins_pT);
-	TH1D* h_chiTotCorrChic1_1D_pT_midCMS_num = new TH1D("h_chiTotCorrChic1_1D_pT_midCMS_num", "h_chiTotCorrChic1_1D_pT_midCMS_num; p_{T}", nbins_pT, bins_pT);
 	TH1D* h_chiTotCorrChic1_1D_pT_midCMS_rat = new TH1D("h_chiTotCorrChic1_1D_pT_midCMS_rat", "h_chiTotCorrChic1_1D_pT_midCMS_rat; p_{T}", nbins_pT, bins_pT);
-
-	TH1D* h_chiTotCorrChic1_1D_pT_fwdCMS_den = new TH1D("h_chiTotCorrChic1_1D_pT_fwdCMS_den", "h_chiTotCorrChic1_1D_pT_fwdCMS_den; p_{T}", nbins_pT, bins_pT);
-	TH1D* h_chiTotCorrChic1_1D_pT_fwdCMS_num = new TH1D("h_chiTotCorrChic1_1D_pT_fwdCMS_num", "h_chiTotCorrChic1_1D_pT_fwdCMS_num; p_{T}", nbins_pT, bins_pT);
 	TH1D* h_chiTotCorrChic1_1D_pT_fwdCMS_rat = new TH1D("h_chiTotCorrChic1_1D_pT_fwdCMS_rat", "h_chiTotCorrChic1_1D_pT_fwdCMS_rat; p_{T}", nbins_pT, bins_pT);
-
-	TH1D* h_chiTotCorrChic1_1D_pT_bkwCMS_den = new TH1D("h_chiTotCorrChic1_1D_pT_bkwCMS_den", "h_chiTotCorrChic1_1D_pT_bkwCMS_den; p_{T}", nbins_pT, bins_pT);
-	TH1D* h_chiTotCorrChic1_1D_pT_bkwCMS_num = new TH1D("h_chiTotCorrChic1_1D_pT_bkwCMS_num", "h_chiTotCorrChic1_1D_pT_bkwCMS_num; p_{T}", nbins_pT, bins_pT);
 	TH1D* h_chiTotCorrChic1_1D_pT_bkwCMS_rat = new TH1D("h_chiTotCorrChic1_1D_pT_bkwCMS_rat", "h_chiTotCorrChic1_1D_pT_bkwCMS_rat; p_{T}", nbins_pT, bins_pT);
 
-	h_chiTotCorrChic1_1D_pT_all_den->Sumw2();
-	h_chiTotCorrChic1_1D_y_den->Sumw2();
-	h_chiTotCorrChic1_1D_nTrk_all_den->Sumw2();
-	h_chiTotCorrChic1_1D_pT_midCMS_den->Sumw2();
-	h_chiTotCorrChic1_1D_pT_fwdCMS_den->Sumw2();
-	h_chiTotCorrChic1_1D_pT_bkwCMS_den->Sumw2();
-
-	h_chiTotCorrChic1_1D_pT_all_num->Sumw2();
-	h_chiTotCorrChic1_1D_y_num->Sumw2();
-	h_chiTotCorrChic1_1D_nTrk_all_num->Sumw2();
-	h_chiTotCorrChic1_1D_pT_midCMS_num->Sumw2();
-	h_chiTotCorrChic1_1D_pT_fwdCMS_num->Sumw2();
-	h_chiTotCorrChic1_1D_pT_bkwCMS_num->Sumw2();
-
-
 	/////////////////HISTOGRAM OF CHIC2//////////////////////// 
-
-	TH1D* h_chiTotCorrChic2_1D_pT_all_den = new TH1D("h_chiTotCorrChic2_1D_pT_all_den", "h_chiTotCorrChic2_1D_pT_all_den; p_{T}", nbins_pT, bins_pT);
-	TH1D* h_chiTotCorrChic2_1D_pT_all_num = new TH1D("h_chiTotCorrChic2_1D_pT_all_num", "h_chiTotCorrChic2_1D_pT_all_num; p_{T}", nbins_pT, bins_pT);
 	TH1D* h_chiTotCorrChic2_1D_pT_all_rat = new TH1D("h_chiTotCorrChic2_1D_pT_all_rat", "h_chiTotCorrChic2_1D_pT_all_rat; p_{T}", nbins_pT, bins_pT);
-
-	TH1D* h_chiTotCorrChic2_1D_y_den = new TH1D("h_chiTotCorrChic2_1D_y_den", "h_chiTotCorrChic2_1D_y_den; y", nbins_y, bins_y);
-	TH1D* h_chiTotCorrChic2_1D_y_num = new TH1D("h_chiTotCorrChic2_1D_y_num", "h_chiTotCorrChic2_1D_y_num; y", nbins_y, bins_y);
 	TH1D* h_chiTotCorrChic2_1D_y_rat = new TH1D("h_chiTotCorrChic2_1D_y_rat", "h_chiTotCorrChic2_1D_y_rat; y", nbins_y, bins_y);
-
-	TH1D* h_chiTotCorrChic2_1D_nTrk_all_den = new TH1D("h_chiTotCorrChic2_1D_nTrk_all_den", "h_chiTotCorrChic2_1D_nTrk_all_den; nTrk", nbins_nTrk, bins_nTrk);
-	TH1D* h_chiTotCorrChic2_1D_nTrk_all_num = new TH1D("h_chiTotCorrChic2_1D_nTrk_all_num", "h_chiTotCorrChic2_1D_nTrk_all_num; nTrk", nbins_nTrk, bins_nTrk);
 	TH1D* h_chiTotCorrChic2_1D_nTrk_all_rat = new TH1D("h_chiTotCorrChic2_1D_nTrk_all_rat", "h_chiTotCorrChic2_1D_nTrk_all_rat; nTrk", nbins_nTrk, bins_nTrk);
-
-	TH1D* h_chiTotCorrChic2_1D_pT_midCMS_den = new TH1D("h_chiTotCorrChic2_1D_pT_midCMS_den", "h_chiTotCorrChic2_1D_pT_midCMS_den; p_{T}", nbins_pT, bins_pT);
-	TH1D* h_chiTotCorrChic2_1D_pT_midCMS_num = new TH1D("h_chiTotCorrChic2_1D_pT_midCMS_num", "h_chiTotCorrChic2_1D_pT_midCMS_num; p_{T}", nbins_pT, bins_pT);
 	TH1D* h_chiTotCorrChic2_1D_pT_midCMS_rat = new TH1D("h_chiTotCorrChic2_1D_pT_midCMS_rat", "h_chiTotCorrChic2_1D_pT_midCMS_rat; p_{T}", nbins_pT, bins_pT);
-
-	TH1D* h_chiTotCorrChic2_1D_pT_fwdCMS_den = new TH1D("h_chiTotCorrChic2_1D_pT_fwdCMS_den", "h_chiTotCorrChic2_1D_pT_fwdCMS_den; p_{T}", nbins_pT, bins_pT);
-	TH1D* h_chiTotCorrChic2_1D_pT_fwdCMS_num = new TH1D("h_chiTotCorrChic2_1D_pT_fwdCMS_num", "h_chiTotCorrChic2_1D_pT_fwdCMS_num; p_{T}", nbins_pT, bins_pT);
 	TH1D* h_chiTotCorrChic2_1D_pT_fwdCMS_rat = new TH1D("h_chiTotCorrChic2_1D_pT_fwdCMS_rat", "h_chiTotCorrChic2_1D_pT_fwdCMS_rat; p_{T}", nbins_pT, bins_pT);
-
-	TH1D* h_chiTotCorrChic2_1D_pT_bkwCMS_den = new TH1D("h_chiTotCorrChic2_1D_pT_bkwCMS_den", "h_chiTotCorrChic2_1D_pT_bkwCMS_den; p_{T}", nbins_pT, bins_pT);
-	TH1D* h_chiTotCorrChic2_1D_pT_bkwCMS_num = new TH1D("h_chiTotCorrChic2_1D_pT_bkwCMS_num", "h_chiTotCorrChic2_1D_pT_bkwCMS_num; p_{T}", nbins_pT, bins_pT);
 	TH1D* h_chiTotCorrChic2_1D_pT_bkwCMS_rat = new TH1D("h_chiTotCorrChic2_1D_pT_bkwCMS_rat", "h_chiTotCorrChic2_1D_pT_bkwCMS_rat; p_{T}", nbins_pT, bins_pT);
 
-	h_chiTotCorrChic2_1D_pT_all_den->Sumw2();
-	h_chiTotCorrChic2_1D_y_den->Sumw2();
-	h_chiTotCorrChic2_1D_nTrk_all_den->Sumw2();
-	h_chiTotCorrChic2_1D_pT_midCMS_den->Sumw2();
-	h_chiTotCorrChic2_1D_pT_fwdCMS_den->Sumw2();
-	h_chiTotCorrChic2_1D_pT_bkwCMS_den->Sumw2();
-
-	h_chiTotCorrChic2_1D_pT_all_num->Sumw2();
-	h_chiTotCorrChic2_1D_y_num->Sumw2();
-	h_chiTotCorrChic2_1D_nTrk_all_num->Sumw2();
-	h_chiTotCorrChic2_1D_pT_midCMS_num->Sumw2();
-	h_chiTotCorrChic2_1D_pT_fwdCMS_num->Sumw2();
-	h_chiTotCorrChic2_1D_pT_bkwCMS_num->Sumw2();
-
-
 	/////////////////HISTOGRAM OF CHIC1/CHIC2//////////////////////// 
-
 	TH1D* h_chiTotCorrChic1toChic2_1D_pT_all_rat = new TH1D("h_chiTotCorrChic1toChic2_1D_pT_all_rat", "h_chiTotCorrChic1toChic2_1D_pT_all_rat; p_{T}", nbins_pT, bins_pT);
 	TH1D* h_chiTotCorrChic1toChic2_1D_y_rat = new TH1D("h_chiTotCorrChic1toChic2_1D_y_rat", "h_chiTotCorrChic1toChic2_1D_y_rat; y", nbins_y, bins_y);
 	TH1D* h_chiTotCorrChic1toChic2_1D_nTrk_all_rat = new TH1D("h_chiTotCorrChic1toChic2_1D_nTrk_all_rat", "h_chiTotCorrChic1toChic2_1D_nTrk_all_rat; nTrk", nbins_nTrk, bins_nTrk);
@@ -826,7 +692,7 @@ int PolarizationStudy(double lambdaTheta1 = 0.50, double lambdaTheta2 = -0.39, c
 	
 	Long64_t nentries = event_tree->GetEntries();
 	cout << "n entries: "<<nentries << endl;
-	if (nentries > 50000) { nentries = 10000; }
+	//if (nentries > 50000) { nentries = 10000; }
 
 
 	for (Long64_t i = 0; i < nentries; i++) {
@@ -1043,7 +909,7 @@ int PolarizationStudy(double lambdaTheta1 = 0.50, double lambdaTheta2 = -0.39, c
 
 	//////////////////////////////////////////////////////////////
 	// WRITE IN THE FILE
-	///////////////////////
+	//////////////////////////////////////////////////////////////
 
 	TFile* fout = new TFile(fileOut, "RECREATE");
 
@@ -1052,8 +918,6 @@ int PolarizationStudy(double lambdaTheta1 = 0.50, double lambdaTheta2 = -0.39, c
 
 
 	//// Write the muon acceptance
-
-
 
 	h_chiCorrectionMuonAcceptance1D_pT_all_den->Write();
 	h_chiCorrectionMuonAcceptance1D_y_den->Write();
@@ -1131,9 +995,6 @@ int PolarizationStudy(double lambdaTheta1 = 0.50, double lambdaTheta2 = -0.39, c
 
 
 
-
-
-
 	//// write the major part of the corrections
 
 
@@ -1157,7 +1018,6 @@ int PolarizationStudy(double lambdaTheta1 = 0.50, double lambdaTheta2 = -0.39, c
 	h_chiCorrectionMajorPart1D_pT_midCMS_rat->Write();
 	h_chiCorrectionMajorPart1D_pT_fwdCMS_rat->Write();
 	h_chiCorrectionMajorPart1D_pT_bkwCMS_rat->Write();
-
 
 	h_chiCorrMajorPartChic1_1D_pT_all_den->Write();
 	h_chiCorrMajorPartChic1_1D_y_den->Write();
@@ -1213,53 +1073,26 @@ int PolarizationStudy(double lambdaTheta1 = 0.50, double lambdaTheta2 = -0.39, c
 
 
 
+	/// write the final plots : combine acceptance and efficiecny effect
+	
+    effMulti(h_chiCorrectionMuonAcceptance1D_pT_all_rat, h_chiCorrectionMajorPart1D_pT_all_rat, 
+	         h_chiTotalCorrection1D_pT_all_rat);
+    effMulti(h_chiCorrectionMuonAcceptance1D_y_rat, h_chiCorrectionMajorPart1D_y_rat, 
+	         h_chiTotalCorrection1D_y_rat);
+    effMulti(h_chiCorrectionMuonAcceptance1D_pT_midCMS_rat, h_chiCorrectionMajorPart1D_pT_midCMS_rat, 
+	         h_chiTotalCorrection1D_pT_midCMS_rat);			 
+    effMulti(h_chiCorrectionMuonAcceptance1D_pT_fwdCMS_rat, h_chiCorrectionMajorPart1D_pT_fwdCMS_rat, 
+	         h_chiTotalCorrection1D_pT_fwdCMS_rat);
+    effMulti(h_chiCorrectionMuonAcceptance1D_pT_bkwCMS_rat, h_chiCorrectionMajorPart1D_pT_bkwCMS_rat, 
+	         h_chiTotalCorrection1D_pT_bkwCMS_rat);
 
-
-
-	/// write the final plots
-
-
-
-
-
-	h_chiTotalCorrection1D_pT_all_den->Write();
-	h_chiTotalCorrection1D_y_den->Write();
-	h_chiTotalCorrection1D_nTrk_den->Write();
-	h_chiTotalCorrection1D_nTrk_all_den->Write();
-	h_chiTotalCorrection1D_pT_mid_den->Write();
-	h_chiTotalCorrection1D_pT_fwd_den->Write();
-	h_chiTotalCorrection1D_pT_fwdOnly_den->Write();
-	h_chiTotalCorrection1D_pT_bkwOnly_den->Write();
-	h_chiTotalCorrection1D_pT_fwdOnlyWide_den->Write();
-	h_chiTotalCorrection1D_pT_bkwOnlyWide_den->Write();
-	h_chiTotalCorrection1D_pT_midCMS_den->Write();
-	h_chiTotalCorrection1D_pT_fwdCMS_den->Write();
-	h_chiTotalCorrection1D_pT_bkwCMS_den->Write();
-
-	h_chiTotalCorrection1D_pT_all_num->Write();
-	h_chiTotalCorrection1D_y_num->Write();
-	h_chiTotalCorrection1D_nTrk_num->Write();
-	h_chiTotalCorrection1D_nTrk_all_num->Write();
-	h_chiTotalCorrection1D_pT_mid_num->Write();
-	h_chiTotalCorrection1D_pT_fwd_num->Write();
-	h_chiTotalCorrection1D_pT_fwdOnly_num->Write();
-	h_chiTotalCorrection1D_pT_bkwOnly_num->Write();
-	h_chiTotalCorrection1D_pT_fwdOnlyWide_num->Write();
-	h_chiTotalCorrection1D_pT_bkwOnlyWide_num->Write();
-	h_chiTotalCorrection1D_pT_midCMS_num->Write();
-	h_chiTotalCorrection1D_pT_fwdCMS_num->Write();
-	h_chiTotalCorrection1D_pT_bkwCMS_num->Write();
+    effMultiNtrk(h_chiCorrectionMuonAcceptance1D_nTrk_all_rat, h_chiCorrectionMajorPart1D_nTrk_all_rat, 
+	            h_chiTotalCorrection1D_nTrk_all_rat);  
 
 	h_chiTotalCorrection1D_pT_all_rat->Write();
 	h_chiTotalCorrection1D_y_rat->Write();
 	h_chiTotalCorrection1D_nTrk_rat->Write();
 	h_chiTotalCorrection1D_nTrk_all_rat->Write();
-	h_chiTotalCorrection1D_pT_mid_rat->Write();
-	h_chiTotalCorrection1D_pT_fwd_rat->Write();
-	h_chiTotalCorrection1D_pT_fwdOnly_rat->Write();
-	h_chiTotalCorrection1D_pT_bkwOnly_rat->Write();
-	h_chiTotalCorrection1D_pT_fwdOnlyWide_rat->Write();
-	h_chiTotalCorrection1D_pT_bkwOnlyWide_rat->Write();
 	h_chiTotalCorrection1D_pT_midCMS_rat->Write();
 	h_chiTotalCorrection1D_pT_fwdCMS_rat->Write();
 	h_chiTotalCorrection1D_pT_bkwCMS_rat->Write();
@@ -1267,34 +1100,32 @@ int PolarizationStudy(double lambdaTheta1 = 0.50, double lambdaTheta2 = -0.39, c
 
 	//write histograms for Chic1/Chic2 Efficiency
 
-	h_chiTotCorrChic1_1D_pT_all_den->Write();
-	h_chiTotCorrChic1_1D_y_den->Write();
-	h_chiTotCorrChic1_1D_nTrk_all_den->Write();
-	h_chiTotCorrChic1_1D_pT_midCMS_den->Write();
-	h_chiTotCorrChic1_1D_pT_fwdCMS_den->Write();
-	h_chiTotCorrChic1_1D_pT_bkwCMS_den->Write();
+    effMulti(h_chiCorrMuonAcceptanceChic1_1D_pT_all_rat, h_chiCorrMajorPartChic1_1D_pT_all_rat, 
+	         h_chiTotCorrChic1_1D_pT_all_rat);
+    effMulti(h_chiCorrMuonAcceptanceChic1_1D_y_rat, h_chiCorrMajorPartChic1_1D_y_rat, 
+	         h_chiTotCorrChic1_1D_y_rat);
+    effMulti(h_chiCorrMuonAcceptanceChic1_1D_pT_midCMS_rat, h_chiCorrMajorPartChic1_1D_pT_midCMS_rat, 
+	         h_chiTotCorrChic1_1D_pT_midCMS_rat);
+    effMulti(h_chiCorrMuonAcceptanceChic1_1D_pT_fwdCMS_rat, h_chiCorrMajorPartChic1_1D_pT_fwdCMS_rat, 
+	         h_chiTotCorrChic1_1D_pT_fwdCMS_rat);
+    effMulti(h_chiCorrMuonAcceptanceChic1_1D_pT_bkwCMS_rat, h_chiCorrMajorPartChic1_1D_pT_bkwCMS_rat, 
+	         h_chiTotalCorrection1D_pT_bkwCMS_rat);
 
-	h_chiTotCorrChic1_1D_pT_all_num->Write();
-	h_chiTotCorrChic1_1D_y_num->Write();
-	h_chiTotCorrChic1_1D_nTrk_all_num->Write();
-	h_chiTotCorrChic1_1D_pT_midCMS_num->Write();
-	h_chiTotCorrChic1_1D_pT_fwdCMS_num->Write();
-	h_chiTotCorrChic1_1D_pT_bkwCMS_num->Write();
+    effMulti(h_chiCorrMuonAcceptanceChic2_1D_pT_all_rat, h_chiCorrMajorPartChic2_1D_pT_all_rat, 
+	         h_chiTotCorrChic2_1D_pT_all_rat);
+    effMulti(h_chiCorrMuonAcceptanceChic2_1D_y_rat, h_chiCorrMajorPartChic2_1D_y_rat, 
+	         h_chiTotCorrChic2_1D_y_rat);
+    effMulti(h_chiCorrMuonAcceptanceChic2_1D_pT_midCMS_rat, h_chiCorrMajorPartChic2_1D_pT_midCMS_rat, 
+	         h_chiTotCorrChic2_1D_pT_midCMS_rat);
+    effMulti(h_chiCorrMuonAcceptanceChic2_1D_pT_fwdCMS_rat, h_chiCorrMajorPartChic2_1D_pT_fwdCMS_rat, 
+	         h_chiTotCorrChic2_1D_pT_fwdCMS_rat);
+    effMulti(h_chiCorrMuonAcceptanceChic2_1D_pT_bkwCMS_rat, h_chiCorrMajorPartChic2_1D_pT_bkwCMS_rat, 
+	         h_chiTotCorrChic2_1D_pT_bkwCMS_rat);
 
-
-	h_chiTotCorrChic2_1D_pT_all_den->Write();
-	h_chiTotCorrChic2_1D_y_den->Write();
-	h_chiTotCorrChic2_1D_nTrk_all_den->Write();
-	h_chiTotCorrChic2_1D_pT_midCMS_den->Write();
-	h_chiTotCorrChic2_1D_pT_fwdCMS_den->Write();
-	h_chiTotCorrChic2_1D_pT_bkwCMS_den->Write();
-
-	h_chiTotCorrChic2_1D_pT_all_num->Write();
-	h_chiTotCorrChic2_1D_y_num->Write();
-	h_chiTotCorrChic2_1D_nTrk_all_num->Write();
-	h_chiTotCorrChic2_1D_pT_midCMS_num->Write();
-	h_chiTotCorrChic2_1D_pT_fwdCMS_num->Write();
-	h_chiTotCorrChic2_1D_pT_bkwCMS_num->Write();
+    effMultiNtrk(h_chiCorrMuonAcceptanceChic1_1D_nTrk_all_rat, h_chiCorrMajorPartChic1_1D_nTrk_all_rat,
+                    h_chiTotCorrChic1_1D_nTrk_all_rat);
+    effMultiNtrk(h_chiCorrMuonAcceptanceChic2_1D_nTrk_all_rat, h_chiCorrMajorPartChic2_1D_nTrk_all_rat, 
+	            h_chiTotCorrChic2_1D_nTrk_all_rat); 
 
 	h_chiTotCorrChic1_1D_pT_all_rat->Write();
 	h_chiTotCorrChic1_1D_y_rat->Write();
@@ -1310,14 +1141,29 @@ int PolarizationStudy(double lambdaTheta1 = 0.50, double lambdaTheta2 = -0.39, c
 	h_chiTotCorrChic2_1D_pT_fwdCMS_rat->Write();
 	h_chiTotCorrChic2_1D_pT_bkwCMS_rat->Write();
 
+
+	/////////Efficiency of Chic1/Chic2///////////////////
+
+    effMulti(h_chiCorrMuonAcceptanceChic1toChic2_1D_pT_all_rat, h_chiCorrMajorPartChic1toChic2_1D_pT_all_rat, 
+	         h_chiTotCorrChic1toChic2_1D_pT_all_rat);
+    effMulti(h_chiCorrMuonAcceptanceChic1toChic2_1D_y_rat, h_chiCorrMajorPartChic1toChic2_1D_y_rat, 
+	         h_chiTotCorrChic1toChic2_1D_y_rat);
+    effMulti(h_chiCorrMuonAcceptanceChic1toChic2_1D_pT_midCMS_rat, h_chiCorrMajorPartChic1toChic2_1D_pT_midCMS_rat, 
+	         h_chiTotCorrChic1toChic2_1D_pT_midCMS_rat);
+    effMulti(h_chiCorrMuonAcceptanceChic1toChic2_1D_pT_fwdCMS_rat, h_chiCorrMajorPartChic1toChic2_1D_pT_fwdCMS_rat, 
+	         h_chiTotCorrChic1toChic2_1D_pT_fwdCMS_rat);
+    effMulti(h_chiCorrMuonAcceptanceChic1toChic2_1D_pT_bkwCMS_rat, h_chiCorrMajorPartChic1toChic2_1D_pT_bkwCMS_rat, 
+	         h_chiTotCorrChic1toChic2_1D_pT_bkwCMS_rat);
+
+    effMultiNtrk(h_chiCorrMuonAcceptanceChic1toChic2_1D_nTrk_all_rat, h_chiCorrMajorPartChic1toChic2_1D_nTrk_all_rat, 
+	            h_chiTotCorrChic1toChic2_1D_nTrk_all_rat); 
+
 	h_chiTotCorrChic1toChic2_1D_pT_all_rat->Write();
 	h_chiTotCorrChic1toChic2_1D_y_rat->Write();
 	h_chiTotCorrChic1toChic2_1D_nTrk_all_rat->Write();
 	h_chiTotCorrChic1toChic2_1D_pT_midCMS_rat->Write();
 	h_chiTotCorrChic1toChic2_1D_pT_fwdCMS_rat->Write();
 	h_chiTotCorrChic1toChic2_1D_pT_bkwCMS_rat->Write();
-
-
 
 
 	fout->Close();
