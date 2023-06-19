@@ -1109,7 +1109,7 @@ int PolarizationStudy(double lambdaTheta1 = 0.00, double lambdaTheta2 = 0.00, co
     effMulti(h_chiCorrMuonAcceptanceChic1_1D_pT_fwdCMS_rat, h_chiCorrMajorPartChic1_1D_pT_fwdCMS_rat, 
 	         h_chiTotCorrChic1_1D_pT_fwdCMS_rat);
     effMulti(h_chiCorrMuonAcceptanceChic1_1D_pT_bkwCMS_rat, h_chiCorrMajorPartChic1_1D_pT_bkwCMS_rat, 
-	         h_chiTotalCorrection1D_pT_bkwCMS_rat);
+	         h_chiTotCorrChic1_1D_pT_bkwCMS_rat);
 
     effMulti(h_chiCorrMuonAcceptanceChic2_1D_pT_all_rat, h_chiCorrMajorPartChic2_1D_pT_all_rat, 
 	         h_chiTotCorrChic2_1D_pT_all_rat);
