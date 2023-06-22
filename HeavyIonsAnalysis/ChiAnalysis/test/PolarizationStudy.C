@@ -90,7 +90,7 @@ void effMultiNtrk(TH1D* hNtrk, TH1D* h, TH1D* output){
 
 }
 
-int PolarizationStudy(double lambdaTheta1 = 0.00, double lambdaTheta2 = 0.00, const char* fileOut = "Chic_PolarizationStudy_vTest-bothDir.root", int PhotSystIdx = 0, const char* fileInMC = "/eos/cms/store/group/phys_heavyions/okukral/Chi_c/Chi_c_pPb8TeV_MC-Official_v3-bothDir.root", const char* fileInMCNoFilter = "/eos/cms/store/group/phys_heavyions/okukral/Chi_c/Chi_c_pPb8TeV_MC_noFilter.root", const char* fileMCWeight = "MCWeight_v2.root")
+int PolarizationStudy(double lambdaTheta1 = 0.55, double lambdaTheta2 = -0.39, const char* fileOut = "Chic_PolarizationStudy_vTest-bothDir", int PhotSystIdx = 0, const char* fileInMC = "/eos/cms/store/group/phys_heavyions/okukral/Chi_c/Chi_c_pPb8TeV_MC-Official_v3-bothDir.root", const char* fileInMCNoFilter = "/eos/cms/store/group/phys_heavyions/okukral/Chi_c/Chi_c_pPb8TeV_MC_noFilter.root", const char* fileMCWeight = "MCWeight_v2.root")
 {
 	//int PhotSystIdx = 0;
 	
@@ -911,10 +911,12 @@ int PolarizationStudy(double lambdaTheta1 = 0.00, double lambdaTheta2 = 0.00, co
 	// WRITE IN THE FILE
 	//////////////////////////////////////////////////////////////
 
-	TFile* fout = new TFile(fileOut, "RECREATE");
+        std::string slambda1 = std::to_string(lambdaTheta1).substr(0,4);
+        if(lambdaTheta1<0) {slambda1 = std::to_string(lambdaTheta1).substr(0,5);}
+        std::string slambda2 = std::to_string(lambdaTheta2).substr(0,4);
+        if(lambdaTheta2<0) {slambda2 = std::to_string(lambdaTheta2).substr(0,5);}
 
-	
-
+	TFile* fout = new TFile(TString(fileOut)+"_lambdaTheta1_"+TString(slambda1)+"_lambdaTheta2_"+TString(slambda2)+".root", "RECREATE");
 
 
 	//// Write the muon acceptance

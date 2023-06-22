@@ -30,28 +30,28 @@ void RemoveXError(TGraphAsymmErrors* gAS);
 void plotSystematics(TFile* myFile1, TFile* myFile2, TGraph* gSystOutputArrayMC[nFittingSets], std::string type, TString title);
 
 
-int GetSystematicPolarization()  // produces MC systematic from the different MC trees, makes plots, and stores the actual value in a root file
+int GetPolarization()  // produces MC systematic from the different MC trees, makes plots, and stores the actual value in a root file
 {
 
 	setTDRStyle();
 	gStyle->SetPadRightMargin(0.03);
 
-	TGraph* gSystOutputArrayMC_chic[nFittingSets]; // stores the polarization effect - chic over J/Psi
-    TGraph* gSystOutputArrayMC_chic1[nFittingSets]; // stores the systematic uncertainty - chic1 over J/Psi
-    TGraph* gSystOutputArrayMC_chic2[nFittingSets]; // stores the systematic uncertainty - chic2 over J/Psi
-    TGraph* gSystOutputArrayMC_chic1_over_chic2[nFittingSets]; // stores the systematic uncertainty - chic1 over chic2
+	TH1D* gOutputArrayMC_chic[nFittingSets]; // stores the polarization effect - chic over J/Psi
+        TH1D* gOutputArrayMC_chic1[nFittingSets]; // stores the systematic uncertainty - chic1 over J/Psi
+        TH1D* gOutputArrayMC_chic2[nFittingSets]; // stores the systematic uncertainty - chic2 over J/Psi
+        TH1D* gOutputArrayMC_chic1_over_chic2[nFittingSets]; // stores the systematic uncertainty - chic1 over chic2
 
 	// Load data
 	TFile* myFile1 = new TFile("Chi_c_WeightsMC_Official_vTest-bothDir_lambdaTheta1_0.00_lambdaTheta2_0.00.root", "READ");
-	TFile* myFile2 = new TFile("Chi_c_WeightsMC_Official_vTest-bothDir_lambdaTheta1_0.50_lambdaTheta2_-0.39.root", "READ");
+	TFile* myFile2 = new TFile("Chi_c_WeightsMC_Official_vTest-bothDir_lambdaTheta1_0.55_lambdaTheta2_-0.39.root", "READ");
 
-    plotSystematics(myFile1, myFile2, gSystOutputArrayMC_chic, "chiTotalCorrection1D", "#chi_{c} / J/#Psi");
-    plotSystematics(myFile1, myFile2, gSystOutputArrayMC_chic1, "chiTotCorrChic1_1D", "#chi_{c1} / J/#Psi");
-    plotSystematics(myFile1, myFile2, gSystOutputArrayMC_chic2, "chiTotCorrChic2_1D", "#chi_{c2} / J/#Psi");
-    plotSystematics(myFile1, myFile2, gSystOutputArrayMC_chic1_over_chic2, "chiTotCorrChic1toChic2_1D", "#chi_{c1} / #chi_{c2}");
+        plotPolarization(myFile1, myFile2, gOutputArrayMC_chic, "chiTotalCorrection1D", "#chi_{c} / J/#Psi");
+        plotPolarization(myFile1, myFile2, gOutputArrayMC_chic1, "chiTotCorrChic1_1D", "#chi_{c1} / J/#Psi");
+        plotPolarization(myFile1, myFile2, gOutputArrayMC_chic2, "chiTotCorrChic2_1D", "#chi_{c2} / J/#Psi");
+        plotPolarization(myFile1, myFile2, gSystOutputArrayMC_chic1_over_chic2, "chiTotCorrChic1toChic2_1D", "#chi_{c1} / #chi_{c2}");
 
-    std::cout<<"save output"<<std::endl;
-    TFile* fout = new TFile(fileOutCon.c_str(), "RECREATE");
+        std::cout<<"save output"<<std::endl;
+        TFile* fout = new TFile(fileOutCon.c_str(), "RECREATE");
 
 	for (int i = 0; i < nFittingSets; i++)
 	{
@@ -66,7 +66,7 @@ int GetSystematicPolarization()  // produces MC systematic from the different MC
 }
 
 
-void plotSystematics(TFile* myFile1, TFile* myFile2, TGraph* gSystOutputArrayMC[nFittingSets], std::string type, TString title)
+void plotPolarization(TFile* myFile1, TFile* myFile2, TH1D* gOutput[nFittingSets], std::string type, TString title)
 {
 
 	TCanvas* cankres1 = new TCanvas("cankres1","Canvas with results1",960,960);
@@ -88,8 +88,6 @@ void plotSystematics(TFile* myFile1, TFile* myFile2, TGraph* gSystOutputArrayMC[
 	{
 		std::string hName = "h_"+type+"_" + setsToPlot.at(iResult) + "_rat";
 
-                //if(type=="chiTotalCorrection1D" && setsToPlot.at(iResult)=="pT_all") 
-                //   hName = "h_"+type+"_" + setsToPlot.at(iResult) + "_rta";
 
 		TH1D* gAS_Result = (TH1D*)myFile1->Get(hName.c_str());
 		TH1D* gAS_Result2 = (TH1D*)myFile2->Get(hName.c_str());
@@ -159,7 +157,7 @@ void plotSystematics(TFile* myFile1, TFile* myFile2, TGraph* gSystOutputArrayMC[
 		leg->SetTextFont(42);
 		leg->SetTextSize(0.04);
 		leg->AddEntry(gAS_Result, "unpolarized", "p");
-		leg->AddEntry(gAS_Result2, "#lambda_{c1} = 0.5, #lambda_{c2} = -0.39", "p");
+		leg->AddEntry(gAS_Result2, "#lambda_{c1} = 0.55, #lambda_{c2} = -0.39", "p");
 
 		leg->Draw("same");
 
@@ -183,8 +181,10 @@ void plotSystematics(TFile* myFile1, TFile* myFile2, TGraph* gSystOutputArrayMC[
 
 		// ADD DIFFERENCE PLOT
 		pad2->cd();
-		TH1D* h_diffToNom2 = (TH1D*)gAS_Result2->Clone(); //needed to initialize hist
-		h_diffToNom2->Divide(gAS_Result2, gAS_Result);
+		gOutput[iResult] = (TH1D*)gAS_Result2->Clone(); //needed to initialize hist
+		gOutput[iResult]->Divide(gAS_Result2, gAS_Result);
+                gOutput[iResult]->SetNameTitle(("gPolarOverUnpolar_"+ type + "_" + fittingSets.at(iResult)).c_str(), ("Polarization effect on " + fittingSets.at(iResult)).c_str());
+
 
 		TH1F* hframe2 = new TH1F("hframe2", "", 1, cLowX, cHighX);
 		//hframe2->Draw();
@@ -213,26 +213,11 @@ void plotSystematics(TFile* myFile1, TFile* myFile2, TGraph* gSystOutputArrayMC[
 		cankres1->SaveAs("PolarizationEffect/" + sEffName + "_" + sNameTag + "_"+TString(type)+".png");
 
 
-		// READOUT TO FILE
-		gSystOutputArrayMC[iResult] = new TGraph(gAS_Result->GetNbinsX()); // create the graph with the same number of points
-		cout << "gSystOutputArrayMC_"+ type +"_"+ fittingSets.at(iResult) << endl;
-
-		gSystOutputArrayMC[iResult]->SetNameTitle(("gSystOutputArrayMC_"+ type + "_" + fittingSets.at(iResult)).c_str(), ("MC syst uncertainty for " + fittingSets.at(iResult)).c_str());
-
-		for (int iPoint = 0; iPoint < gAS_Result->GetNbinsX(); iPoint++)
-		{
-			double systValue = abs(h_diffToNom2->GetBinContent(iPoint+1)-1);
-			systValue = systValue * 100; //make it percents
-                        cout<<"systValue "<<systValue<<endl;
-			gSystOutputArrayMC[iResult]->SetPoint(iPoint, gAS_Result->GetBinCenter(iPoint+1), systValue);
-		}
-
-
 		//delete hframe;
 		//delete hframe2;
 	}
 
-    //delete cankres1;
+        //delete cankres1;
 	//delete pad1;
 	//delete pad2; 
 }
