@@ -338,8 +338,10 @@ double WeightPhotonAcceptanceSystematic(double photon_pt, int idx = 0); // weigh
 // currently idx 1 and 2 are largest variations, others need not to be considered
 
 double PolarizationCosTheta(TLorentzVector* LVdimuon, TLorentzVector* LVmuon); // calculates cos theta for the J/psi, based on Jeongho
-
 double PolarizationWeight(TLorentzVector* LVdimuon, TLorentzVector* LVmuon, double lambdaTheta = 0); // assigns weight to chic, assuming the polarization axes are the same as for J/psi. Following Arxiv 1103.4882. Based on Jeongho 
+double PolarizationWeight_ChicStateWeighted(TLorentzVector* LVdimuon, TLorentzVector* LVmuon, int gen_pdgId, double lambdaTheta = 0); // created as a new function that can be called instead of "PolarizationWeight", if chic2/chic1 ratio matters
+
+double Polarizationlambda_pTdependence(double jpsi_pt, TLorentzVector* jpsi_p4, int gen_pdgId);  // copied from Jeongho
 
 
 

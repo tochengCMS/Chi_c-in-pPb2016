@@ -692,7 +692,7 @@ int PolarizationStudy(double lambdaTheta1 = 0.55, double lambdaTheta2 = -0.39, c
 	
 	Long64_t nentries = event_tree->GetEntries();
 	cout << "n entries: "<<nentries << endl;
-	//if (nentries > 50000) { nentries = 10000; }
+	if (nentries > 50000) { nentries = 1000; cout << "running on test sample" << endl; }
 
 
 	for (Long64_t i = 0; i < nentries; i++) {
@@ -767,9 +767,15 @@ int PolarizationStudy(double lambdaTheta1 = 0.55, double lambdaTheta2 = -0.39, c
 			// get the polarization reweighting based on lambdaTheta for chic_1 or chic_2
 			if (pdgId == PythCode_chic1) {
 				polarizedWeight = PolarizationWeight(LVJpsi, LVmuonPositive, lambdaTheta1);
+				cout << "chic1 weight " << polarizedWeight << endl;
+				polarizedWeight = PolarizationWeight_ChicStateWeighted(LVJpsi, LVmuonPositive, pdgId, lambdaTheta1);
+				cout << "chic1 weight with direction " << polarizedWeight << endl;
 			}
 			if (pdgId == PythCode_chic2) {
 				polarizedWeight = PolarizationWeight(LVJpsi, LVmuonPositive, lambdaTheta2);
+				cout << "chic2 weight " << polarizedWeight << endl;
+				polarizedWeight = PolarizationWeight_ChicStateWeighted(LVJpsi, LVmuonPositive, pdgId, lambdaTheta2);
+				cout << "chic2 weight with direction " << polarizedWeight << endl;
 			}
 			double MCweightPol = MCweight * polarizedWeight;
 

@@ -15,6 +15,7 @@
 #include "tdrstyle.C"
 #include "CMS_lumi.C"
 #include "../ChiFitterInit.h"
+#include "plottingHelper.C"
 
 const TString sEffName= "Nominal";
 const float cLowX = 0, cHighX = 30;
@@ -27,10 +28,7 @@ double pointXShift = 0.3;
 //const TString sNameTag = "_nTrk";
 
 const float _markerSize = 2.4;
-void RemoveXError(TGraphAsymmErrors* gAS);
-void PrepareSystPlotting(TGraphAsymmErrors* gAS_Result_Syst, TGraphAsymmErrors* gAS_Result, TGraph* g_Systematics, double errorWidth); // adds the systematic uncertainty stored in percents as TGraph to our results (gAS_Result), and stores it in the separate gAS for plotting
-void ShiftXPosition(TGraphAsymmErrors* gAS, double shiftSize); // move the points to avoid overlap
-void PrintOutTable(TGraphAsymmErrors* gAS, TGraphAsymmErrors* gAS_Syst);
+
 
 int plotNominal_pT()
 {
@@ -234,9 +232,29 @@ int plotNominal_pT()
 	//gAS_Result_pp_Syst->Draw("2");
 	//gAS_Result_pp->Draw("ZPE");
 
+
+
 	////////////////
 	/// PLOT OUR DATA
 	///////////////
+
+	// Add polarization
+
+	TGraphAsymmErrors* gAS_Result_polarized = new TGraphAsymmErrors(gAS_Result->GetN());
+	ApplyPolarization(gAS_Result_polarized, gAS_Result, "gPolarOverUnpolar_chiTotalCorrection1D_pt_all");
+
+	gAS_Result_polarized->SetMarkerSize(0.9*_markerSize);
+	gAS_Result_polarized->SetMarkerColor(kGreen+1);
+	gAS_Result_polarized->SetMarkerStyle(20);
+	gAS_Result_polarized->SetLineColor(kGreen+1);
+	gAS_Result_polarized->SetLineStyle(7);
+	gAS_Result_polarized->SetLineWidth(3);
+
+	gAS_Result_polarized->Draw("L");
+
+
+
+
 
 
 	//gAS_Result_Syst->Draw("[]");
@@ -261,12 +279,12 @@ int plotNominal_pT()
 	CMS_lumi(cankres1, 0, 10); //left top
 
 	//TLegend*leg = new TLegend(0.50, 0.20, 0.88, 0.45, sEffName+" efficiency");
-	TLegend*leg = new TLegend(0.58, 0.18, 0.85, 0.4, "");
+	TLegend*leg = new TLegend(0.52, 0.18, 0.85, 0.4, "");
 	//TLegend*leg = new TLegend(0.58, 0.18, 0.85, 0.49, "");
 	leg->SetFillColor(kWhite);
 	leg->SetBorderSize(0);
 	leg->SetTextFont(42);
-	leg->SetTextSize(0.047);
+	leg->SetTextSize(0.042);
 
 	//leg->AddEntry(gAS_Result, "6.5<p_{T}<30 GeV/c", "p");
 	//leg->AddEntry(gAS_Result, "|y|<1.0, 6.5<p_{T}<30 GeV/c", "p");
@@ -281,7 +299,8 @@ int plotNominal_pT()
 	//leg->AddEntry(gAS_Result2, "Forward:      1.0<y_{CMS}<2.0", "p");
 
 	//leg->AddEntry(gAS_Result, "#splitline{pPb #sqrt{s_{NN}}=8.16 TeV}{-2.9 < y_{CM} < 1.9}", "p");
-	leg->AddEntry(gAS_Result, "-2.9 < y_{CM} < 1.9", "p");
+	leg->AddEntry(gAS_Result, "-2.9 < y_{CM} < 1.9, unpol.", "p");
+	leg->AddEntry(gAS_Result_polarized, "Polarized   #splitline{#lambda_{#theta}(#chi_{c1})  = 0.55}{#lambda_{#theta}(#chi_{c2}) =-0.39}", "l");
 	//leg->AddEntry(gAS_Result_pp, "#splitline{pp  #sqrt{s}=7 TeV}{2.0 < y_{CM} < 4.5}", "p");
 	//leg->AddEntry(gAS_Result3, "1.0<|y|<2.4", "p");
 	leg->Draw("same");
@@ -300,56 +319,3 @@ int plotNominal_pT()
 	return 0;
 }
 
-
-void RemoveXError(TGraphAsymmErrors* gAS)
-{
-	for (int i = 0; i < gAS->GetN(); i++)
-	{
-		gAS->SetPointEXlow(i, 0);
-		gAS->SetPointEXhigh(i, 0);
-	}
-}
-
-void PrepareSystPlotting(TGraphAsymmErrors* gAS_Result_Syst, TGraphAsymmErrors* gAS_Result, TGraph* g_Systematics, double errorWidth) {
-	if (gAS_Result_Syst->GetN() <= g_Systematics->GetN()) { //smaller, because of nTrk dependence which has an extra bin
-		for (int i = 0; i < gAS_Result_Syst->GetN(); i++) {
-			if (gAS_Result_Syst->GetPointX(i) != g_Systematics->GetPointX(i)) {
-				cout << "SYSTEMATICS AND NOMINAL HAVE DIFFERENT BINNING: " << gAS_Result_Syst->GetPointX(i) << " " << g_Systematics->GetPointX(i) << endl;
-			}
-
-			gAS_Result_Syst->SetPointEYhigh(i, g_Systematics->GetPointY(i)*0.01*gAS_Result->GetPointY(i)); //change from percent, and multiply by value
-			gAS_Result_Syst->SetPointEYlow(i, g_Systematics->GetPointY(i)*0.01*gAS_Result->GetPointY(i)); //change from percent, and multiply by value
-			gAS_Result_Syst->SetPointEXhigh(i, errorWidth);
-			gAS_Result_Syst->SetPointEXlow(i, errorWidth);
-		}
-
-	}
-	else { cout << "DIFFERENT NUMBER OF BINS BETWEEN SYST AND NOMINAL " << gAS_Result_Syst->GetN() << " " << g_Systematics->GetN() << endl; }
-}
-
-void ShiftXPosition(TGraphAsymmErrors* gAS, double shiftSize)
-{
-	for (int i = 0; i < gAS->GetN(); i++) {
-		gAS->SetPointX(i, gAS->GetPointX(i) + shiftSize);
-	}
-
-}
-
-void PrintOutTable(TGraphAsymmErrors* gAS, TGraphAsymmErrors* gAS_Syst)
-{
-	cout << endl << "******************************" << endl;
-	cout << " Printing out table: " << endl;
-	cout << "Graph name: " << gAS->GetName() << " and title: " << gAS->GetTitle() << endl;
-	cout << "******************************" << endl << endl;
-	//cout.precision(precision);
-	//cout<<std::fixed;
-
-	cout << "Bin  " << " Values" << endl;
-	for (int i = 0; i < gAS->GetN(); i++)
-	{
-		cout << endl << gAS->GetPointX(i); printf(" & $ %.3f \\pm %.3f \\pm %.3f $ ", gAS->GetPointY(i), gAS->GetErrorY(i), gAS_Syst->GetErrorY(i));
-	}
-
-
-	cout << endl << endl;
-}

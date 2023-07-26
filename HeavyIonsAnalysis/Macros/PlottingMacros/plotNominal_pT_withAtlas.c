@@ -15,6 +15,7 @@
 #include "tdrstyle.C"
 #include "CMS_lumi.C"
 #include "../ChiFitterInit.h"
+#include "plottingHelper.C"
 
 const TString sEffName= "Nominal";
 const float cLowX = 0, cHighX = 30;
@@ -27,9 +28,7 @@ double pointXShift = -0.2;
 //const TString sNameTag = "_nTrk";
 
 const float _markerSize = 2.4;
-void RemoveXError(TGraphAsymmErrors* gAS);
-void PrepareSystPlotting(TGraphAsymmErrors* gAS_Result_Syst, TGraphAsymmErrors* gAS_Result, TGraph* g_Systematics, double errorWidth); // adds the systematic uncertainty stored in percents as TGraph to our results (gAS_Result), and stores it in the separate gAS for plotting
-void ShiftXPosition(TGraphAsymmErrors* gAS, double shiftSize); // move the points to avoid overlap
+
 
 
 int plotNominal_pT_withAtlas()
@@ -361,7 +360,7 @@ int plotNominal_pT_withAtlas()
 	//leg->AddEntry(gAS_Result2, "Forward:      1.0<y_{CMS}<2.0", "p");
 
 	leg->AddEntry(gAS_Result, "#splitline{pPb #sqrt{s_{NN}}=8.16 TeV}{-1.0 < y_{CM} < 1.0}", "p");
-	leg->AddEntry(gAS_Result_ppAtlas, "#splitline{pp  #sqrt{s}=7 TeV, ATLAS}{0.75 < y_{CM} < 0.75}", "p");
+	leg->AddEntry(gAS_Result_ppAtlas, "#splitline{pp  #sqrt{s}=7 TeV, ATLAS}{|y_{CM}| < 0.75}", "p");
 	//leg->AddEntry(gAS_Result3, "1.0<|y|<2.4", "p");
 	leg->Draw("same");
 
@@ -377,39 +376,4 @@ int plotNominal_pT_withAtlas()
 	cankres1->SaveAs("NominalResultDCB_" + sEffName + sNameTag + ".png");
 
 	return 0;
-}
-
-
-void RemoveXError(TGraphAsymmErrors* gAS)
-{
-	for (int i = 0; i < gAS->GetN(); i++)
-	{
-		gAS->SetPointEXlow(i, 0);
-		gAS->SetPointEXhigh(i, 0);
-	}
-}
-
-void PrepareSystPlotting(TGraphAsymmErrors* gAS_Result_Syst, TGraphAsymmErrors* gAS_Result, TGraph* g_Systematics, double errorWidth) {
-	if (gAS_Result_Syst->GetN() <= g_Systematics->GetN()) { //smaller, because of nTrk dependence which has an extra bin
-		for (int i = 0; i < gAS_Result_Syst->GetN(); i++) {
-			if (gAS_Result_Syst->GetPointX(i) != g_Systematics->GetPointX(i)) {
-				cout << "SYSTEMATICS AND NOMINAL HAVE DIFFERENT BINNING: " << gAS_Result_Syst->GetPointX(i) << " " << g_Systematics->GetPointX(i) << endl;
-			}
-
-			gAS_Result_Syst->SetPointEYhigh(i, g_Systematics->GetPointY(i)*0.01*gAS_Result->GetPointY(i)); //change from percent, and multiply by value
-			gAS_Result_Syst->SetPointEYlow(i, g_Systematics->GetPointY(i)*0.01*gAS_Result->GetPointY(i)); //change from percent, and multiply by value
-			gAS_Result_Syst->SetPointEXhigh(i, errorWidth);
-			gAS_Result_Syst->SetPointEXlow(i, errorWidth);
-		}
-
-	}
-	else { cout << "DIFFERENT NUMBER OF BINS BETWEEN SYST AND NOMINAL " << gAS_Result_Syst->GetN() << " " << g_Systematics->GetN() << endl; }
-}
-
-void ShiftXPosition(TGraphAsymmErrors* gAS, double shiftSize)
-{
-	for (int i = 0; i < gAS->GetN(); i++) {
-		gAS->SetPointX(i, gAS->GetPointX(i) + shiftSize);
-	}
-
 }

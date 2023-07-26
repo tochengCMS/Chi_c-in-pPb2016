@@ -772,10 +772,42 @@ double PolarizationCosTheta(TLorentzVector* LVdimuon, TLorentzVector* LVmuon) //
 double PolarizationWeight(TLorentzVector* LVdimuon, TLorentzVector* LVmuon, double lambdaTheta) // assigns weight to chic, assuming the polarization axes are the same as for J/psi. Following Arxiv 1103.4882 
 {
 	double cosTheta = PolarizationCosTheta(LVdimuon, LVmuon);
-	double weight = 1 + lambdaTheta * cosTheta*cosTheta;
+	double weight = 3/(3-lambdaTheta)*(1 + lambdaTheta * cosTheta*cosTheta);
 	return weight;
 }
 
+double PolarizationWeight_ChicStateWeighted(TLorentzVector* LVdimuon, TLorentzVector* LVmuon, int gen_pdgId, double lambdaTheta) // created as a new function that can be called instead of "PolarizationWeight", if chic2/chic1 ratio matters
+{
+	double weight = PolarizationWeight(LVdimuon, LVmuon, lambdaTheta); 
+	if (gen_pdgId == 20443) { //chic1
+		weight *= 1.12;	//weights based on a study from 12.7.2023
+	}
+	else if (gen_pdgId == 445) { //chic2
+		weight *= 0.8;	//weights based on a study from 12.7.2023
+	}
+	else {
+		cout << "Warning, the chic state Pythia code not recognized. Weight returned but no chic state weighting done" << endl;
+	}
+	return weight;
+}
+
+
+double Polarizationlambda_pTdependence(double jpsi_pt, TLorentzVector* jpsi_p4, int gen_pdgId)  // copied from Jeongho
+{
+	double jpsi_mass = jpsi_p4->M();
+	double jpsiptM = jpsi_pt / jpsi_mass;
+	double lambdaTheta = 1;
+	if (jpsiptM < 5 && gen_pdgId == 20443) {
+		lambdaTheta = -0.06*jpsiptM + 0.8;
+	}
+	if (jpsiptM > 5 && gen_pdgId == 20443) {
+		lambdaTheta = 0.004*jpsiptM + 0.48;
+	}
+	if (gen_pdgId == 445) {
+		lambdaTheta = 0.075*jpsiptM - 0.95;
+	}
+	return lambdaTheta;
+}
 
 
 ////////////////////////////

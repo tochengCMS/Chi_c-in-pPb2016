@@ -14,7 +14,7 @@
 
 #include "tdrstyle.C"
 #include "CMS_lumi.C"
-
+#include "plottingHelper.C"
 
 const TString sEffName= "Nominal";
 //const float cLowX = 5, cHighX = 30;
@@ -27,10 +27,7 @@ double systErrorWidth = 0.1;
 double pointXShift = 0;
 
 const float _markerSize = 2.4;
-void RemoveXError(TGraphAsymmErrors* gAS);
-void PrepareSystPlotting(TGraphAsymmErrors* gAS_Result_Syst, TGraphAsymmErrors* gAS_Result, TGraph* g_Systematics, double errorWidth); // adds the systematic uncertainty stored in percents as TGraph to our results (gAS_Result), and stores it in the separate gAS for plotting
-void ShiftXPosition(TGraphAsymmErrors* gAS, double shiftSize); // move the points to avoid overlap
-void PrintOutTable(TGraphAsymmErrors* gAS, TGraphAsymmErrors* gAS_Syst);
+
 
 int plotNominal_y()
 {
@@ -129,20 +126,21 @@ int plotNominal_y()
 	gAS_Result->SetLineColor(kRed);
 	gAS_Result->SetLineWidth(2);
 
-	//gAS_Result2->SetMarkerSize(0.9*_markerSize);
-	//gAS_Result2->SetMarkerColor(kBlue);
-	//gAS_Result2->SetMarkerStyle(25);
-	//gAS_Result2->SetLineColor(kBlue);
-	//gAS_Result2->SetLineWidth(2);
+	// Polarization
 
-	//gAS_Result3->SetMarkerSize(1.1*_markerSize);
-	//gAS_Result3->SetMarkerColor(kGreen+3);
-	//gAS_Result3->SetMarkerStyle(30);
-	//gAS_Result3->SetLineColor(kGreen+3);
-	//gAS_Result3->SetLineWidth(2);
+	TGraphAsymmErrors* gAS_Result_polarized = new TGraphAsymmErrors(gAS_Result->GetN());
+	ApplyPolarization(gAS_Result_polarized, gAS_Result, "gPolarOverUnpolar_chiTotalCorrection1D_y");
 
-	//gAS_Result2->SetPointEYlow(3, 0.08);
-	//gAS_Result2->SetPointEYhigh(3, 0.08);
+	gAS_Result_polarized->SetMarkerSize(0.9*_markerSize);
+	gAS_Result_polarized->SetMarkerColor(kGreen + 1);
+	gAS_Result_polarized->SetMarkerStyle(20);
+	gAS_Result_polarized->SetLineColor(kGreen + 1);
+	gAS_Result_polarized->SetLineStyle(7);
+	gAS_Result_polarized->SetLineWidth(3);
+
+
+
+
 
 	////kill x errors
 	//RemoveXError(gAS_pp);
@@ -152,6 +150,10 @@ int plotNominal_y()
 	cankres1->cd();
 	//cankres1->SetLogx();
 	//one->Draw("Same");
+
+
+	gAS_Result_polarized->Draw("L");
+
 
 	gAS_Result_Syst->Draw("2");
 
@@ -165,13 +167,14 @@ int plotNominal_y()
 
 	//TLegend*leg = new TLegend(0.50, 0.20, 0.88, 0.45, sEffName+" efficiency");
 	//TLegend*leg = new TLegend(0.58, 0.18, 0.88, 0.4, "");
-	TLegend*leg = new TLegend(0.20, 0.18, 0.58, 0.32, "");
+	TLegend*leg = new TLegend(0.20, 0.18, 0.58, 0.34, "");
 	leg->SetFillColor(kWhite);
 	leg->SetBorderSize(0);
 	leg->SetTextFont(42);
-	leg->SetTextSize(0.05);
+	leg->SetTextSize(0.042);
 
-	leg->AddEntry(gAS_Result, "6.5<p_{T}<30 GeV/c", "p");
+	leg->AddEntry(gAS_Result, "6.5<p_{T}<30 GeV/c, unpol", "p");
+	leg->AddEntry(gAS_Result_polarized, "Polarized   #splitline{#lambda_{#theta}(#chi_{c1})  = 0.55}{#lambda_{#theta}(#chi_{c2}) =-0.39}", "l");
 	//leg->AddEntry(gAS_Result, "|y|<1.0, 6.5<p_{T}<30 GeV/c", "p");
 
 	//leg->AddEntry(gAS_Result, "Midrapidity: |y|<1.0", "p");
@@ -215,26 +218,26 @@ int plotNominal_y()
 	pText2->SetFillColor(0);
 	pText2->Draw("");
 
-	// Add the paves displayng the ranges for CM fits
-	TPave* pBackward = new TPave(-1.535, 0.12, -0.535, 0.28, 0, "NB");
-	pBackward->SetFillColor(kGreen+3);
-	pBackward->SetFillStyle(3006);
-	pBackward->Draw();
+	//// Add the paves displayng the ranges for CM fits
+	//TPave* pBackward = new TPave(-1.535, 0.12, -0.535, 0.28, 0, "NB");
+	//pBackward->SetFillColor(kGreen+3);
+	//pBackward->SetFillStyle(3006);
+	//pBackward->Draw();
 
-	TPave* pMid = new TPave(-0.535, 0.12, 1.465, 0.28, 0, "NB");
-	pMid->SetFillColor(kOrange + 1);
-	pMid->SetFillStyle(3007);
-	pMid->Draw();
+	//TPave* pMid = new TPave(-0.535, 0.12, 1.465, 0.28, 0, "NB");
+	//pMid->SetFillColor(kOrange + 1);
+	//pMid->SetFillStyle(3007);
+	//pMid->Draw();
 
-	TPave* pForward = new TPave(1.465, 0.12, 2.4, 0.28, 0, "NB");
-	pForward->SetFillColor(kBlue);
-	pForward->SetFillStyle(3006);
-	pForward->Draw();
+	//TPave* pForward = new TPave(1.465, 0.12, 2.4, 0.28, 0, "NB");
+	//pForward->SetFillColor(kBlue);
+	//pForward->SetFillStyle(3006);
+	//pForward->Draw();
 
 
-	cankres1->SaveAs("NominalResultDCB_" + sEffName + sNameTag + "_boxes.root");
-	cankres1->SaveAs("NominalResultDCB_" + sEffName + sNameTag + "_boxes.pdf");
-	cankres1->SaveAs("NominalResultDCB_" + sEffName + sNameTag + "_boxes.png");
+	cankres1->SaveAs("NominalResultDCB_" + sEffName + sNameTag + ".root");
+	cankres1->SaveAs("NominalResultDCB_" + sEffName + sNameTag + ".pdf");
+	cankres1->SaveAs("NominalResultDCB_" + sEffName + sNameTag + ".png");
 
 	PrintOutTable(gAS_Result, gAS_Result_Syst);
 
@@ -245,55 +248,3 @@ int plotNominal_y()
 	return 0;
 }
 
-
-void RemoveXError(TGraphAsymmErrors* gAS)
-{
-	for (int i = 0; i < gAS->GetN(); i++)
-	{
-		gAS->SetPointEXlow(i, 0);
-		gAS->SetPointEXhigh(i, 0);
-	}
-}
-void PrepareSystPlotting(TGraphAsymmErrors* gAS_Result_Syst, TGraphAsymmErrors* gAS_Result, TGraph* g_Systematics, double errorWidth) {
-	if (gAS_Result_Syst->GetN() <= g_Systematics->GetN()) { //smaller, because of nTrk dependence which has an extra bin
-		for (int i = 0; i < gAS_Result_Syst->GetN(); i++) {
-			if (gAS_Result_Syst->GetPointX(i) != g_Systematics->GetPointX(i)) {
-				cout << "SYSTEMATICS AND NOMINAL HAVE DIFFERENT BINNING: " << gAS_Result_Syst->GetPointX(i) << " " << g_Systematics->GetPointX(i) << endl;
-			}
-
-			gAS_Result_Syst->SetPointEYhigh(i, g_Systematics->GetPointY(i)*0.01*gAS_Result->GetPointY(i)); //change from percent, and multiply by value
-			gAS_Result_Syst->SetPointEYlow(i, g_Systematics->GetPointY(i)*0.01*gAS_Result->GetPointY(i)); //change from percent, and multiply by value
-			gAS_Result_Syst->SetPointEXhigh(i, errorWidth);
-			gAS_Result_Syst->SetPointEXlow(i, errorWidth);
-		}
-
-	}
-	else { cout << "DIFFERENT NUMBER OF BINS BETWEEN SYST AND NOMINAL " << gAS_Result_Syst->GetN() << " " << g_Systematics->GetN() << endl; }
-}
-
-void ShiftXPosition(TGraphAsymmErrors* gAS, double shiftSize)
-{
-	for (int i = 0; i < gAS->GetN(); i++) {
-		gAS->SetPointX(i, gAS->GetPointX(i) + shiftSize);
-	}
-
-}
-
-void PrintOutTable(TGraphAsymmErrors* gAS, TGraphAsymmErrors* gAS_Syst) 
-{
-	cout << endl << "******************************" << endl;
-	cout<< " Printing out table: " << endl;
-	cout << "Graph name: " << gAS->GetName() << " and title: " << gAS->GetTitle() << endl;
-	cout <<  "******************************" << endl << endl;
-	//cout.precision(precision);
-	//cout<<std::fixed;
-
-	cout << "Bin  " << " Values" << endl;
-	for (int i = 0; i < gAS->GetN(); i++)
-	{
-		cout << endl<< gAS->GetPointX(i); printf(" & $ %.3f \\pm %.3f \\pm %.3f $ ", gAS->GetPointY(i), gAS->GetErrorY(i), gAS_Syst->GetErrorY(i));
-	}
-	
-
-	cout << endl << endl;
-}

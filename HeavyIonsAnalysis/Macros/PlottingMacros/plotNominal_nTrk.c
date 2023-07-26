@@ -14,7 +14,7 @@
 
 #include "tdrstyle.C"
 #include "CMS_lumi.C"
-
+#include "plottingHelper.C"
 
 const TString sEffName= "Nominal";
 //const float cLowX = 5, cHighX = 30;
@@ -28,10 +28,7 @@ double pointXShift = 0;
 
 
 const float _markerSize = 2.4;
-void RemoveXError(TGraphAsymmErrors* gAS);
-void PrepareSystPlotting(TGraphAsymmErrors* gAS_Result_Syst, TGraphAsymmErrors* gAS_Result, TGraph* g_Systematics, double errorWidth); // adds the systematic uncertainty stored in percents as TGraph to our results (gAS_Result), and stores it in the separate gAS for plotting
-void ShiftXPosition(TGraphAsymmErrors* gAS, double shiftSize); // move the points to avoid overlap
-void PrintOutTable(TGraphAsymmErrors* gAS, TGraphAsymmErrors* gAS_Syst);
+
 
 int plotNominal_nTrk()
 {
@@ -147,6 +144,20 @@ int plotNominal_nTrk()
 	//gAS_Result2->SetLineWidth(2);
 
 	
+		// Polarization
+
+	TGraphAsymmErrors* gAS_Result_polarized = new TGraphAsymmErrors(gAS_Result->GetN());
+	ApplyPolarization(gAS_Result_polarized, gAS_Result, "gPolarOverUnpolar_chiTotalCorrection1D_nTrack_all");
+
+	gAS_Result_polarized->SetMarkerSize(0.9*_markerSize);
+	gAS_Result_polarized->SetMarkerColor(kGreen + 1);
+	gAS_Result_polarized->SetMarkerStyle(20);
+	gAS_Result_polarized->SetLineColor(kGreen + 1);
+	gAS_Result_polarized->SetLineStyle(7);
+	gAS_Result_polarized->SetLineWidth(3);
+
+
+
 
 
 
@@ -156,6 +167,10 @@ int plotNominal_nTrk()
 	cankres1->cd();
 	//cankres1->SetLogx();
 	//one->Draw("Same");
+
+
+	gAS_Result_polarized->Draw("L");
+
 
 	gAS_Result_Syst->Draw("2");
 	//gAS_Result_Syst2->Draw("2");
@@ -171,15 +186,16 @@ int plotNominal_nTrk()
 
 	//TLegend*leg = new TLegend(0.50, 0.20, 0.88, 0.45, sEffName+" efficiency");
 	//TLegend*leg = new TLegend(0.58, 0.18, 0.88, 0.4, "");
-	TLegend*leg = new TLegend(0.40, 0.18, 0.88, 0.35, "");
+	TLegend*leg = new TLegend(0.40, 0.18, 0.88, 0.37, "");
 	leg->SetFillColor(kWhite);
 	leg->SetBorderSize(0);
 	leg->SetTextFont(42);
-	leg->SetTextSize(0.05);
+	leg->SetTextSize(0.042);
 
 	//leg->AddEntry(gAS_Result, "6.5<p_{T}<30 GeV/c", "p");
 	//leg->AddEntry(gAS_Result2, "|y|<1.0, 6.5<p_{T}<30 GeV/c", "p");
-	leg->AddEntry(gAS_Result, "|y|<2.4, 6.5<p_{T}<30 GeV/c", "p");
+	leg->AddEntry(gAS_Result, "|y|<2.4, 6.5<p_{T}<30 GeV/c, unpol.", "p");
+	leg->AddEntry(gAS_Result_polarized, "Polarized   #splitline{#lambda_{#theta}(#chi_{c1})  = 0.55}{#lambda_{#theta}(#chi_{c2}) =-0.39}", "l");
 
 	//leg->AddEntry(gAS_Result, "Midrapidity: |y|<1.0", "p");
 	//leg->AddEntry(gAS_Result2, "Forward: 1.6<y<2.4", "p");
@@ -209,56 +225,3 @@ int plotNominal_nTrk()
 	return 0;
 }
 
-
-void RemoveXError(TGraphAsymmErrors* gAS)
-{
-	for (int i = 0; i < gAS->GetN(); i++)
-	{
-		gAS->SetPointEXlow(i, 0);
-		gAS->SetPointEXhigh(i, 0);
-	}
-}
-
-void PrepareSystPlotting(TGraphAsymmErrors* gAS_Result_Syst, TGraphAsymmErrors* gAS_Result, TGraph* g_Systematics, double errorWidth) {
-	if (gAS_Result_Syst->GetN() <= g_Systematics->GetN()) { //smaller, because of nTrk dependence which has an extra bin
-		for (int i = 0; i < gAS_Result_Syst->GetN(); i++) {
-			if (gAS_Result_Syst->GetPointX(i) != g_Systematics->GetPointX(i)) {
-				cout << "SYSTEMATICS AND NOMINAL HAVE DIFFERENT BINNING: " << gAS_Result_Syst->GetPointX(i) << " " << g_Systematics->GetPointX(i) << endl;
-			}
-
-			gAS_Result_Syst->SetPointEYhigh(i, g_Systematics->GetPointY(i)*0.01*gAS_Result->GetPointY(i)); //change from percent, and multiply by value
-			gAS_Result_Syst->SetPointEYlow(i, g_Systematics->GetPointY(i)*0.01*gAS_Result->GetPointY(i)); //change from percent, and multiply by value
-			gAS_Result_Syst->SetPointEXhigh(i, errorWidth);
-			gAS_Result_Syst->SetPointEXlow(i, errorWidth);
-		}
-
-	}
-	else { cout << "DIFFERENT NUMBER OF BINS BETWEEN SYST AND NOMINAL " << gAS_Result_Syst->GetN() << " " << g_Systematics->GetN() << endl; }
-}
-
-void ShiftXPosition(TGraphAsymmErrors* gAS, double shiftSize)
-{
-	for (int i = 0; i < gAS->GetN(); i++) {
-		gAS->SetPointX(i, gAS->GetPointX(i) + shiftSize);
-	}
-
-}
-
-void PrintOutTable(TGraphAsymmErrors* gAS, TGraphAsymmErrors* gAS_Syst)
-{
-	cout << endl << "******************************" << endl;
-	cout << " Printing out table: " << endl;
-	cout << "Graph name: " << gAS->GetName() << " and title: " << gAS->GetTitle() << endl;
-	cout << "******************************" << endl << endl;
-	//cout.precision(precision);
-	//cout<<std::fixed;
-
-	cout << "Bin  " << " Values" << endl;
-	for (int i = 0; i < gAS->GetN(); i++)
-	{
-		cout << endl << gAS->GetPointX(i); printf(" & $ %.3f \\pm %.3f \\pm %.3f $ ", gAS->GetPointY(i), gAS->GetErrorY(i), gAS_Syst->GetErrorY(i));
-	}
-
-
-	cout << endl << endl;
-}
